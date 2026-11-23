@@ -6,6 +6,8 @@ Upstream is merged every night, so every line we touch is a future merge conflic
 **Rule: keep upstream files untouched where possible.** Prefer new files, config and env over edits.
 When an edit is unavoidable, keep it to the fewest lines and mark it with an `Astronave:` comment when the reason is not obvious.
 
+Project memory (diary, decisions, gotchas, features) lives in [`documentation/`](documentation/INDEX.md).
+
 ## What changes vs upstream
 
 - Name "Astronave", appId `com.studiofuturo.astronave`, its own Electron profile dir, so it installs and runs next to T3 Code.
