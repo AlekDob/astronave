@@ -49,3 +49,5 @@ When an edit is unavoidable, keep it to the fewest lines and mark it with an `As
 
 - Icons: `icons:export` needs macOS Icon Composer. Regenerate `assets/prod/*.png`, `*.ico` and the macOS PNG on a Mac.
 - App data still lives in `~/.t3` (shared with an installed T3 Code); the server CLI is still `t3` and the URL scheme `t3code://`.
+
+- `packages/contracts/src/settings.ts`: default `language` is `it` instead of `en`.
