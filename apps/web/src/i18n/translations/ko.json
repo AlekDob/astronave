@@ -12723,5 +12723,10 @@
   "99d51127f573296b": "다른 계정",
   "8ec2c57414669b79": "두 번째 {tracker} 워크스페이스 또는 사용자를 연결합니다.",
   "99963c0142e17f00": "새 {tracker} 계정용입니다.",
-  "6d8e4ebc889bace9": "계정 추가"
+  "6d8e4ebc889bace9": "계정 추가",
+  "46e7b21a46d1eb01": "Plan",
+  "c425f10897de6fee": "Plan mode is on. Click to return to build mode.",
+  "1ef0ccbe5aa656ac": "Plan mode",
+  "9266af6a803b3950": "The agent proposes a plan without editing files.",
+  "82e322fbbb02bbc8": [{ "t": "Kbd", "i": 1, "c": "⇧ Tab" }, " returns to build mode"]
 }

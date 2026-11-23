@@ -5,6 +5,7 @@ import { type AppModelOption } from "../../modelSelection";
 import { useGT, useMessages } from "gt-react";
 import { CircleAlertIcon } from "lucide-react";
 import { CompactComposerControlsMenu } from "./CompactComposerControlsMenu";
+import { ComposerPlanModeChip } from "./ComposerPlanModeChip";
 import { ComposerControl } from "./ComposerControl";
 import {
   ComposerFooterModeControls,
@@ -87,6 +88,8 @@ export function ComposerControlsBar(props: {
   onModelPickerOpenChange: (open: boolean) => void;
   modelPickerIconClassName: string | undefined;
   getModelDisabledReason: ChatComposerProps["getModelDisabledReason"];
+  /** Astronave: set while plan mode is on; the chip it draws turns plan mode off. */
+  onExitPlanMode: (() => void) | null;
 }) {
   const {
     environmentId,
@@ -266,6 +269,9 @@ export function ComposerControlsBar(props: {
   ) : (
     <>
       {composerModelPicker}
+      {props.onExitPlanMode ? (
+        <ComposerPlanModeChip size={controlSize} onToggle={props.onExitPlanMode} />
+      ) : null}
 
       <>
         {restingBlockDefs.map((def, index) => {

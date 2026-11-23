@@ -99,6 +99,8 @@ export function composerCommandKeyHandler(input: {
   /** Predicted next prompt that Tab fills into an empty composer; Escape dismisses it. */
   readonly promptSuggestion: string | null;
   readonly dismissPromptSuggestion: () => void;
+  /** Astronave: Shift+Tab outside a list toggles plan mode; null where the provider lacks it. */
+  readonly togglePlanMode: (() => void) | null;
 }) {
   const {
     keybindings,
@@ -138,6 +140,7 @@ export function composerCommandKeyHandler(input: {
     submitComposer,
     promptSuggestion,
     dismissPromptSuggestion,
+    togglePlanMode,
   } = input;
 
   // The composer persists across threads. A recall from thread A must not
@@ -232,7 +235,10 @@ export function composerCommandKeyHandler(input: {
       prompt: promptRef.current,
     });
     if (key === "Tab" && event.shiftKey && submissionIntent === null) {
-      return applyListEdit(event, listOutdentForTab);
+      if (applyListEdit(event, listOutdentForTab)) return true;
+      if (!togglePlanMode || event.isComposing) return false;
+      togglePlanMode();
+      return true;
     }
     const { trigger } = resolveActiveComposerTrigger();
     const menuIsActive = !isLiteralPendingAnswer && trigger !== null;

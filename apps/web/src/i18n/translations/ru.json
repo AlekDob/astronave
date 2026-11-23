@@ -12786,5 +12786,10 @@
   "99d51127f573296b": "Другой аккаунт",
   "8ec2c57414669b79": "Подключите второе рабочее пространство или пользователя {tracker}.",
   "99963c0142e17f00": "Для нового аккаунта {tracker}.",
-  "6d8e4ebc889bace9": "Добавить аккаунт"
+  "6d8e4ebc889bace9": "Добавить аккаунт",
+  "46e7b21a46d1eb01": "Plan",
+  "c425f10897de6fee": "Plan mode is on. Click to return to build mode.",
+  "1ef0ccbe5aa656ac": "Plan mode",
+  "9266af6a803b3950": "The agent proposes a plan without editing files.",
+  "82e322fbbb02bbc8": [{ "t": "Kbd", "i": 1, "c": "⇧ Tab" }, " returns to build mode"]
 }

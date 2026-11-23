@@ -3208,10 +3208,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "sul computer che ha aperto questa pagina"
-      ]
+      "c": [" ", "sul computer che ha aperto questa pagina"]
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3223,10 +3220,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "· chi lo esegue ottiene questo accesso"
-      ]
+      "c": [" ", "· chi lo esegue ottiene questo accesso"]
     }
   ],
   "c54cc9c75db9dc58": "Approva solo un accesso che hai appena avviato.",
@@ -12792,5 +12786,10 @@
   "99d51127f573296b": "Un altro account",
   "8ec2c57414669b79": "Collega un secondo workspace o utente di {tracker}.",
   "99963c0142e17f00": "Per il nuovo account {tracker}.",
-  "6d8e4ebc889bace9": "Aggiungi account"
+  "6d8e4ebc889bace9": "Aggiungi account",
+  "46e7b21a46d1eb01": "Piano",
+  "c425f10897de6fee": "Modalità piano attiva. Clicca per tornare alla modalità normale.",
+  "1ef0ccbe5aa656ac": "Modalità piano",
+  "9266af6a803b3950": "L'agente propone un piano senza modificare i file.",
+  "82e322fbbb02bbc8": [{ "t": "Kbd", "i": 1, "c": "⇧ Tab" }, " torna alla modalità normale"]
 }
