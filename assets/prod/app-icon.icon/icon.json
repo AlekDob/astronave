@@ -6,21 +6,19 @@
     {
       "layers": [
         {
-          "image-name": "text.svg",
-          "name": "Text",
-          "position": {
-            "scale": 8.5,
-            "translation-in-points": [0, 0]
-          }
+          "glass": false,
+          "image-name": "rocket.png",
+          "name": "Rocket"
         }
       ],
       "shadow": {
-        "kind": "neutral",
-        "opacity": 0.5
+        "kind": "none",
+        "opacity": 0
       },
+      "specular": false,
       "translucency": {
-        "enabled": true,
-        "value": 0.5
+        "enabled": false,
+        "value": 0
       }
     }
   ],
