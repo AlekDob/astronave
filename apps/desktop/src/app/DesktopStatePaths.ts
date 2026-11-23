@@ -16,7 +16,8 @@ export function resolveDesktopBaseDir(input: {
   readonly t3Home: Option.Option<string>;
 }): string {
   return Option.getOrElse(normalizeConfiguredBaseDir(input.t3Home), () =>
-    input.joinPath(input.homeDirectory, ".t3"),
+    // Astronave: own data dir, so it never shares ~/.t3 with an installed T3 Code.
+    input.joinPath(input.homeDirectory, ".astronave"),
   );
 }
 

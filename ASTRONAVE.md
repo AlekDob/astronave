@@ -10,6 +10,7 @@ Project memory (diary, decisions, gotchas, features) lives in [`documentation/`]
 
 ## What changes vs upstream
 
+- Data in `~/.astronave` (desktop default; `T3CODE_HOME` still overrides), never in T3 Code's `~/.t3`.
 - Name "Astronave", appId `com.studiofuturo.astronave`, its own Electron profile dir, so it installs and runs next to T3 Code.
 - Built-in "Astronave" palette (near-black/near-white neutrals, accent `#2433FF`), the default for new users.
 - PostHog analytics off by default (`T3CODE_TELEMETRY_ENABLED=true` turns it back on).
@@ -19,24 +20,26 @@ Project memory (diary, decisions, gotchas, features) lives in [`documentation/`]
 
 ## Files we touch
 
-| File | Why |
-|---|---|
-| `apps/desktop/package.json` | `productName` |
-| `apps/desktop/src/app/DesktopEnvironment.ts` | app base name, Windows AppUserModelId |
-| `apps/desktop/src/app/DesktopUserData.ts` | own profile dir `astronave` (Electron's single-instance lock is keyed on it) |
-| `apps/desktop/src/app/DesktopAppIdentity.ts` | MIT credit in the native About panel |
-| `apps/desktop/src/app/DesktopStartupRecovery.ts` | releases link in the startup error page |
-| `apps/desktop/src/app/*.test.ts` (Identity, Clerk, UserData, PreReadyPlatform) | test literals for the new name and profile dir |
-| `scripts/build-desktop-artifact.ts` (+ `.test.ts`) | electron-builder `appId` and product name |
-| `apps/web/src/branding.ts`, `apps/web/vite.config.ts`, `apps/web/public/manifest.webmanifest` | web app name and title |
-| `apps/web/index.html` | boot copy of the Astronave palette, first-run default theme |
-| `packages/shared/src/themePalettes.ts` | `ASTRONAVE_THEME` |
-| `apps/web/src/components/settings/AboutVersionTitle.tsx` | "Basato su T3 Code (MIT)" link |
-| `apps/server/src/telemetry/AnalyticsService.ts` | analytics default off |
+| File                                                                                          | Why                                                                                |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `apps/desktop/package.json`                                                                   | `productName`                                                                      |
+| `apps/desktop/src/app/DesktopEnvironment.ts`                                                  | app base name, Windows AppUserModelId                                              |
+| `apps/desktop/src/app/DesktopStatePaths.ts` (+ `DesktopEnvironment.test.ts`)                  | default data dir `~/.astronave` instead of `~/.t3` (`T3CODE_HOME` still overrides) |
+| `apps/desktop/src/app/DesktopUserData.ts`                                                     | own profile dir `astronave` (Electron's single-instance lock is keyed on it)       |
+| `apps/desktop/src/app/DesktopAppIdentity.ts`                                                  | MIT credit in the native About panel                                               |
+| `apps/desktop/src/app/DesktopStartupRecovery.ts`                                              | releases link in the startup error page                                            |
+| `apps/desktop/src/app/*.test.ts` (Identity, Clerk, UserData, PreReadyPlatform)                | test literals for the new name and profile dir                                     |
+| `scripts/build-desktop-artifact.ts` (+ `.test.ts`)                                            | electron-builder `appId` and product name                                          |
+| `apps/web/src/branding.ts`, `apps/web/vite.config.ts`, `apps/web/public/manifest.webmanifest` | web app name and title                                                             |
+| `apps/web/index.html`                                                                         | boot copy of the Astronave palette, first-run default theme                        |
+| `packages/shared/src/themePalettes.ts`                                                        | `ASTRONAVE_THEME`                                                                  |
 | `packages/contracts/src/settings.ts` | default `language` is `it` |
-| `assets/prod/app-icon.icon/Assets/text.svg`, `assets/prod/logo.svg` | Astronave mark |
-| `README.md` | Italian header above the original README |
-| `ASTRONAVE.md`, `scripts/astronave/*` | ours only |
+| `apps/web/src/components/settings/AboutVersionTitle.tsx`                                      | "Basato su T3 Code (MIT)" link                                                     |
+| `apps/server/src/telemetry/AnalyticsService.ts`                                               | analytics default off                                                              |
+| `assets/prod/app-icon.icon/Assets/text.svg`, `assets/prod/logo.svg`                           | Astronave mark                                                                     |
+| `README.md`                                                                                   | Italian header above the original README                                           |
+| `knip.jsonc`                                                                                  | `scripts/astronave/translate-it.mjs` as an entry (run from a shell script)         |
+| `ASTRONAVE.md`, `scripts/astronave/*`                                                         | ours only                                                                          |
 
 ## Nightly sync
 
@@ -51,4 +54,4 @@ Project memory (diary, decisions, gotchas, features) lives in [`documentation/`]
 ## Still open
 
 - Icons: `icons:export` needs macOS Icon Composer. Regenerate `assets/prod/*.png`, `*.ico` and the macOS PNG on a Mac.
-- App data still lives in `~/.t3` (shared with an installed T3 Code); the server CLI is still `t3` and the URL scheme `t3code://`.
+- The server CLI is still `t3` (its launcher lives in `~/.astronave/bin`) and the URL scheme `t3code://`.

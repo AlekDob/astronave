@@ -919,7 +919,7 @@ export const IRIS_THEME: ThemeDefinition = {
 
 // Astronave (Studio Futuro): stock near-black/near-white neutrals, periwinkle-blue accent.
 // White on #2433ff is 7.0:1; the dark accent #4a55ff keeps white text at 5.2:1.
-export const ASTRONAVE_THEME: ThemeDefinition = {
+const ASTRONAVE_THEME: ThemeDefinition = {
   id: "astronave",
   label: "Astronave",
   appearance: "light",

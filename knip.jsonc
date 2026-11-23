@@ -33,6 +33,8 @@
         // These fixture scripts are injected into a browser page by path.
         "fixtures/*/*.js",
         "knip-schemas.ts",
+        // Astronave: run by astronave/sync-upstream.sh.
+        "astronave/translate-it.mjs",
         "linux-after-pack.ts",
         "mobile-behavior/run.ts",
         "mobile-native-client.ts",
