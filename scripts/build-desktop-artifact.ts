@@ -983,7 +983,8 @@ interface StagePackageJson {
 }
 
 export const STAGE_INSTALL_ARGS = ["install", "--prod"] as const;
-export const DESKTOP_ELECTRON_LANGUAGES = ["en-US"] as const;
+// Astronave: "it" lets macOS hand Italian to the app, so the UI follows an Italian system.
+export const DESKTOP_ELECTRON_LANGUAGES = ["en-US", "it"] as const;
 export const DESKTOP_FILE_EXCLUSIONS = [
   // Cursor walks from argv[1] to platform assets; helpers and native addons need real paths outside ASAR.
   "!**/node_modules/@cursor/sdk-*/**/*",
@@ -3958,7 +3959,8 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
       ? path.join(stageAppDir, WINDOWS_SERVER_RESOURCE_SOURCE_DIR, WINDOWS_SERVER_ASAR_RESOURCE)
       : undefined;
   const stagePackageJson: StagePackageJson = {
-    name: "t3code",
+    // Astronave: Electron names the macOS keychain key "<name> Safe Storage"; "t3code" would reuse T3 Code's key.
+    name: "astronave",
     version: appVersion,
     buildVersion: appVersion,
     t3codeCommitHash: commitHash,

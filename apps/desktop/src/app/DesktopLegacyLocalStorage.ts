@@ -21,7 +21,8 @@ export class DesktopLegacyLocalStorage extends Context.Service<
 >()("@t3tools/desktop/app/DesktopLegacyLocalStorage") {}
 
 const MARKER_FILE_NAME = "v1-local-storage-imported";
-const V1_PROFILE_NAMES = ["T3 Code (Alpha)", "t3code"];
+// Astronave: never import an installed T3 Code's Local Storage (its settings would override ours).
+const V1_PROFILE_NAMES: ReadonlyArray<string> = [];
 
 const make = Effect.gen(function* () {
   const environment = yield* DesktopEnvironment.DesktopEnvironment;

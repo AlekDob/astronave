@@ -20,26 +20,28 @@ Project memory (diary, decisions, gotchas, features) lives in [`documentation/`]
 
 ## Files we touch
 
-| File                                                                                          | Why                                                                                |
-| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `apps/desktop/package.json`                                                                   | `productName`                                                                      |
-| `apps/desktop/src/app/DesktopEnvironment.ts`                                                  | app base name, Windows AppUserModelId                                              |
-| `apps/desktop/src/app/DesktopStatePaths.ts` (+ `DesktopEnvironment.test.ts`)                  | default data dir `~/.astronave` instead of `~/.t3` (`T3CODE_HOME` still overrides) |
-| `apps/desktop/src/app/DesktopUserData.ts`                                                     | own profile dir `astronave` (Electron's single-instance lock is keyed on it)       |
-| `apps/desktop/src/app/DesktopAppIdentity.ts`                                                  | MIT credit in the native About panel                                               |
-| `apps/desktop/src/app/DesktopStartupRecovery.ts`                                              | releases link in the startup error page                                            |
-| `apps/desktop/src/app/*.test.ts` (Identity, Clerk, UserData, PreReadyPlatform)                | test literals for the new name and profile dir                                     |
-| `scripts/build-desktop-artifact.ts` (+ `.test.ts`)                                            | electron-builder `appId` and product name                                          |
-| `apps/web/src/branding.ts`, `apps/web/vite.config.ts`, `apps/web/public/manifest.webmanifest` | web app name and title                                                             |
-| `apps/web/index.html`                                                                         | boot copy of the Astronave palette, first-run default theme                        |
-| `packages/shared/src/themePalettes.ts`                                                        | `ASTRONAVE_THEME`                                                                  |
-| `packages/contracts/src/settings.ts` | default `language` is `it` |
-| `apps/web/src/components/settings/AboutVersionTitle.tsx`                                      | "Basato su T3 Code (MIT)" link                                                     |
-| `apps/server/src/telemetry/AnalyticsService.ts`                                               | analytics default off                                                              |
-| `assets/prod/app-icon.icon/Assets/text.svg`, `assets/prod/logo.svg`                           | Astronave mark                                                                     |
-| `README.md`                                                                                   | Italian header above the original README                                           |
-| `knip.jsonc`                                                                                  | `scripts/astronave/translate-it.mjs` as an entry (run from a shell script)         |
-| `ASTRONAVE.md`, `scripts/astronave/*`                                                         | ours only                                                                          |
+| File                                                                                          | Why                                                                                                                                                             |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/desktop/package.json`                                                                   | `productName`                                                                                                                                                   |
+| `apps/desktop/src/app/DesktopEnvironment.ts`                                                  | app base name, Windows AppUserModelId                                                                                                                           |
+| `apps/desktop/src/app/DesktopStatePaths.ts` (+ `DesktopEnvironment.test.ts`)                  | default data dir `~/.astronave` instead of `~/.t3` (`T3CODE_HOME` still overrides)                                                                              |
+| `apps/desktop/src/app/DesktopUserData.ts`                                                     | own profile dir `astronave` (Electron's single-instance lock is keyed on it)                                                                                    |
+| `apps/desktop/src/app/DesktopLegacyLocalStorage.ts`                                           | no import of T3 Code's V1 Local Storage (it carried T3's language and settings into Astronave)                                                                  |
+| `apps/desktop/src/app/DesktopAppIdentity.ts`                                                  | MIT credit in the native About panel                                                                                                                            |
+| `apps/desktop/src/app/DesktopStartupRecovery.ts`                                              | releases link in the startup error page                                                                                                                         |
+| `apps/desktop/src/app/*.test.ts` (Identity, Clerk, UserData, PreReadyPlatform)                | test literals for the new name and profile dir                                                                                                                  |
+| `scripts/build-desktop-artifact.ts` (+ `.test.ts`)                                            | electron-builder `appId` and product name; stage package name `astronave` (own keychain "Safe Storage" key); `it` bundle language (UI follows an Italian macOS) |
+| `apps/web/src/branding.ts`, `apps/web/vite.config.ts`, `apps/web/public/manifest.webmanifest` | web app name and title                                                                                                                                          |
+| `apps/web/index.html`                                                                         | boot copy of the Astronave palette, first-run default theme                                                                                                     |
+| `packages/shared/src/themePalettes.ts`                                                        | `ASTRONAVE_THEME`                                                                                                                                               |
+| `packages/contracts/src/settings.ts`                                                          | default `language` is `it`                                                                                                                                      |
+| `apps/web/src/components/sidebar/SidebarChrome.tsx`                                           | sidebar shows the app name instead of the T3 wordmark                                                                                                           |
+| `apps/web/src/components/settings/AboutVersionTitle.tsx`                                      | "Basato su T3 Code (MIT)" link                                                                                                                                  |
+| `apps/server/src/telemetry/AnalyticsService.ts`                                               | analytics default off                                                                                                                                           |
+| `assets/prod/app-icon.icon/Assets/text.svg`, `assets/prod/logo.svg`                           | Astronave mark                                                                                                                                                  |
+| `README.md`                                                                                   | Italian header above the original README                                                                                                                        |
+| `knip.jsonc`                                                                                  | `scripts/astronave/translate-it.mjs` as an entry (run from a shell script)                                                                                      |
+| `ASTRONAVE.md`, `scripts/astronave/*`                                                         | ours only                                                                                                                                                       |
 
 ## Nightly sync
 
