@@ -6,6 +6,10 @@ import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 
+// Astronave: MIT attribution to the upstream project, kept out of the i18n catalog on purpose.
+const UPSTREAM_URL = "https://github.com/pingdotgg/t3code";
+const UPSTREAM_CREDIT = "Basato su T3 Code (MIT)";
+
 export function AboutVersionTitle() {
   const gt = useGT();
   const { copyToClipboard } = useCopyToClipboard<void>({
@@ -48,6 +52,14 @@ export function AboutVersionTitle() {
           </TooltipPopup>
         </Tooltip>
       </code>
+      <a
+        className="text-2xs text-muted-foreground underline"
+        href={UPSTREAM_URL}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {UPSTREAM_CREDIT}
+      </a>
     </span>
   );
 }

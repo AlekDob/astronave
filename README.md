@@ -1,3 +1,13 @@
+# Astronave
+
+Astronave è una versione di T3 Code pensata per chi inizia: interfaccia in italiano, tema Astronave e niente analytics di default.
+È un fork di [T3 Code](https://github.com/pingdotgg/t3code) (licenza MIT, vedi `LICENSE`) e si aggiorna ogni notte dal progetto originale.
+Gli aggiornamenti dell'app desktop arrivano dalle release di [AlekDob/astronave](https://github.com/AlekDob/astronave/releases), mai da T3 Code.
+Cosa cambia rispetto all'originale e come funziona la sincronizzazione: [ASTRONAVE.md](./ASTRONAVE.md).
+Sotto trovi il README originale di T3 Code.
+
+---
+
 <p align="center">
   <a href="https://t3.codes">
     <img src="./assets/prod/t3-black-web-icon-192x192.png" width="80" height="80" alt="T3 Code logo" />

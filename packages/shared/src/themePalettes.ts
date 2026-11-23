@@ -1,4 +1,11 @@
-export const BUILT_IN_THEME_IDS = ["t3-chat", "grove", "ocean", "ember", "iris"] as const;
+export const BUILT_IN_THEME_IDS = [
+  "astronave",
+  "t3-chat",
+  "grove",
+  "ocean",
+  "ember",
+  "iris",
+] as const;
 
 export const MOBILE_DEFAULT_THEME_ID = "t3-code";
 
@@ -910,7 +917,40 @@ export const IRIS_THEME: ThemeDefinition = {
   sidebarArtwork: true,
 };
 
+// Astronave (Studio Futuro): stock near-black/near-white neutrals, periwinkle-blue accent.
+// White on #2433ff is 7.0:1; the dark accent #4a55ff keeps white text at 5.2:1.
+export const ASTRONAVE_THEME: ThemeDefinition = {
+  id: "astronave",
+  label: "Astronave",
+  appearance: "light",
+  colors: {
+    ...T3_CODE_LIGHT_THEME_COLORS,
+    focus: "#2433ff",
+    accent: "#2433ff",
+    update: "#2433ff",
+    updateForeground: "#2433ff",
+    updateSurface: "#e5e7ff",
+    messageAction: "#2433ff",
+    messageActionHover: "#4350ff",
+    terminalCursor: "#2433ff",
+  },
+  variants: {
+    dark: {
+      ...T3_CODE_DARK_THEME_COLORS,
+      focus: "#4a55ff",
+      accent: "#4a55ff",
+      update: "#4a55ff",
+      updateForeground: "#8a93ff",
+      updateSurface: "#14173a",
+      messageAction: "#4a55ff",
+      messageActionHover: "#3b46f0",
+      terminalCursor: "#b4b9ff",
+    },
+  },
+};
+
 export const BUILT_IN_THEMES: ReadonlyArray<ThemeDefinition> = [
+  ASTRONAVE_THEME,
   T3_CHAT_THEME,
   GROVE_THEME,
   OCEAN_THEME,

@@ -99,6 +99,7 @@ export const make = Effect.gen(function* () {
       applicationName: environment.displayName,
       applicationVersion: environment.appVersion,
       version: Option.getOrElse(commitHash, () => "unknown"),
+      credits: "Basato su T3 Code (MIT): https://github.com/pingdotgg/t3code",
     });
 
     if (environment.platform === "win32") {
