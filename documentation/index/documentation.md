@@ -12,7 +12,9 @@ Ranges come from the last refresh: if a symbol moved, Grep for it.
 ## documentation/features/
 - `001-astronave-italiano.md` (18) — 001: Astronave in italiano
 - `002-sync-notturno.md` (17) — 002: allineamento notturno a T3
+- `003-astro-companion.md` (22) — 003: Astro, il compagno delle chat
 
 ## documentation/gotchas/
 - `001-astronave-eredita-t3.md` (21) — 001: Astronave eredita cose da T3 installato
 - `002-icone-solo-su-mac.md` (14) — 002: le icone si generano solo su Mac
+- `003-sync-clone-parziale.md` (18) — 003: il sync fallisce con "not our ref" / "could not fetch ... from promisor remote

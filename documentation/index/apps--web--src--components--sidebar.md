@@ -8,8 +8,8 @@ Ranges come from the last refresh: if a symbol moved, Grep for it.
 ## apps/web/src/components/sidebar/
 - `DesktopUpdateStatusIcon.tsx` (129)
   DesktopUpdateStatusIconState L8-14 · normalizeDesktopUpdateDownloadPercent L16-19 · shouldShowDesktopUpdateCheckIcon L21-31 · shouldContinueDesktopUpdateCheckAnimation L33-41 · DesktopUpdateAvailableIcon L43-53 · DesktopUpdateDownloadingIcon L55-90 · DesktopUpdateDownloadedIcon L92-101 · DesktopUpdateStatusIcon L103-128
-- `SidebarChrome.tsx` (323)
-  SidebarChromeHeader L46-98 · SidebarBrandWidthProbe L100-125 · HistoryNavigationButton L127-168 · SidebarBrand L170-184 · SidebarBrandMark L186-199 · SidebarUtilityItem L201-224 · SidebarChromeFooter L314-322
+- `SidebarChrome.tsx` (327)
+  SidebarChromeHeader L47-101 · SidebarBrandWidthProbe L103-129 · HistoryNavigationButton L131-172 · SidebarBrand L174-188 · SidebarBrandMark L190-203 · SidebarUtilityItem L205-228 · SidebarChromeFooter L318-326
 - `SidebarDraftBlock.browser.test.tsx` (141)
   DraftBlock L13-140
 - `SidebarDraftBlock.tsx` (316)

@@ -132,6 +132,7 @@ Large repo: open only the sub-index of the folder you need.
 - [apps/web/scripts](index/apps--web--scripts.md): 3 files
 - [apps/web/src](index/apps--web--src.md): 196 files
 - [apps/web/src/assets](index/apps--web--src--assets.md): 4 files
+- [apps/web/src/astro](index/apps--web--src--astro.md): 8 files
 - [apps/web/src/browser](index/apps--web--src--browser.md): 46 files
 - [apps/web/src/cloud](index/apps--web--src--cloud.md): 22 files
 - [apps/web/src/components](index/apps--web--src--components.md): 196 files
@@ -178,7 +179,7 @@ Large repo: open only the sub-index of the folder you need.
 - [apps/web/vite](index/apps--web--vite.md): 2 files
 - [assets](index/assets.md): 1 file
 - [docs](index/docs.md): 76 files
-- [documentation](index/documentation.md): 6 files
+- [documentation](index/documentation.md): 8 files
 - [evals](index/evals.md): 43 files
 - [infra](index/infra.md): 144 files
 - [native](index/native.md): 50 files

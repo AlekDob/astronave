@@ -134,8 +134,8 @@ Ranges come from the last refresh: if a symbol moved, Grep for it.
 - `DiffStatLabel.tsx` (51)
   hasNonZeroStat L5-7 · formatCompactDiffCount L9-21 · DiffStatLabel L23-50
 - `DraftHeroHeadline.browser.test.tsx` (95) — The draft route loads ChatView lazily; importing it here keeps its first transform out of the test's timeout.
-- `DraftHeroHeadline.tsx` (387)
-  PickerItem L54-57 · DraftHeroHeadlineProps L59-63 · DraftHeroHeadline L65-386
+- `DraftHeroHeadline.tsx` (390)
+  PickerItem L55-58 · DraftHeroHeadlineProps L60-64 · DraftHeroHeadline L66-389
 - `DraftHeroProjectHeading.tsx` (77)
   DraftHeroProjectHeading L8-76
 - `DraftProjectName.tsx` (17)
