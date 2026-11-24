@@ -48,6 +48,7 @@ import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { DraftHeroProjectHeading } from "./DraftHeroProjectHeading";
 import { TriageDraftHero } from "./TriageDraftHero";
+import { AstroGreeting, AstroHero } from "~/astro/AstroHero";
 
 const ADD_PROJECT_VALUE = "add-project";
 
@@ -359,6 +360,8 @@ export function DraftHeroHeadline({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center">
+      {/* Astronave: Astro and its greeting on every new chat. */}
+      <AstroHero />
       {hasResolvedProject && !isScratchDraft ? (
         <DraftHeroProjectHeading projectName={activeProjectTitle ?? gt("Choose a project")}>
           {projectSelector}
@@ -366,7 +369,7 @@ export function DraftHeroHeadline({
       ) : (
         <h1 className="w-full text-center font-normal text-2xl text-foreground tracking-tight sm:text-3xl">
           {isScratchDraft ? (
-            <T>What should we work on?</T>
+            <AstroGreeting />
           ) : canChooseProject ? (
             <T>
               <Var>{projectSelector}</Var> to start
