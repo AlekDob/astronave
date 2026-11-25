@@ -8,33 +8,33 @@ Ranges come from the last refresh: if a symbol moved, Grep for it.
 
 ## apps/web/src/astro/
 
-- `AstroAvatar.tsx` (86)
+- `AstroAvatar.tsx` (87)
   AstroAvatarSize L16 · AstroAvatar L18-86
-- `astroBrain.test.ts` (210)
-- `astroBrain.ts` (284) — Astro's "brain": files in the scratch root that every project-less chat inherits, because
-  ASTRO_PERSONA_FILE L7 · ASTRO_USER_FILE L8 · ASTRO_MEMORY_FILE L9 · ASTRO_SKILLS_DIR L10 · ASTRO_USER_ARCHIVE L12 · ASTRO_MEMORY_ARCHIVE L13 · ASTRO_SHORT_MEMORY_LIMIT L16 · ASTRO_VERSIONED_FILES L25-46 · ASTRO_SEED_FILES L39-46 · astroManagedText L77-79 · AstroBrainWrite L82-86 · AstroOverflowMove L89-97 · AstroBrainAction L99 · BrainContents L101 · planAstroBrainWrites L104-118 · planManagedWrites L121-128 · astroManagedPaths L130-132 · planOverflow L134-143 · archiveForMove L149-159 · splitOverflow L165-182 · appendToArchive L184-187 · hasArchiveContent L190-192 · ASTRO_VERSION_LIMIT L195 · AstroVersion L197-200 · astroVersionsPath L202-204 · parseVersions L207-219 · isAstroVersion L221-229 · addVersion L232-239 · serializeVersions L241-243 · astroBrainPaths L245-247 · appendAboutUser L250-254 · skillSummary L257-271 · createSerialQueue L277-284
-- `AstroBrainEditor.tsx` (196) — Short memory files show how close they are to the limit.
-  BrainEditorProps L16-23 · useBrainEditor L26-47 · BrainEditorState L49 · BrainTextEditor L51-66 · EditorActions L68-90 · groupThousands L93 · ShortMemoryCounter L95-104 · ConflictNotice L106-121 · NoticeButton L123-129 · VersionsMenu L132-156 · VersionItems L158-184 · useVersionLabel L187-196
-- `AstroBrainEditors.tsx` (306) — Same footprint as a loaded editor (textarea + Save row), so the page does not jump.
-  BrainEditorSkeleton L24-32 · useBrainFileContents L35-49 · BrainFileSection L51-81 · ReadFailed L83-89 · SkillList L91 · useSkillFiles L94-107 · SkillsSection L109-122 · SkillsSkeleton L124-131 · SkillsBody L133-150 · NoSkills L152-158 · SkillRows L160-171 · UnreadableSkills L173-182 · ReadError L185-192 · RetryButton L194-200 · SkillRow L202-234 · Chevron L236-242 · ArchiveView L245-265 · ArchiveContents L267-279 · ArchiveSkeleton L281-288 · ArchiveFiles L290-306
-- `astroBrainFiles.ts` (255) — The scratch project: its root is the parent of every project-less chat folder.
-  AstroBrainTarget L28-31 · AstroSkillFile L33-37 · today L48 · openAstroBrain L52-61 · readBrainFile L64-78 · writeBrainFile L80-92 · listSkillFiles L98-117 · readSkill L119-124 · snapshotBrainFile L127-137 · listBrainVersions L140-146 · saveBrainFile L152-165 · readBrainContents L167-173 · applyBrainAction L175-180 · applyOverflowMove L183-191 · appendPendingAbout L194-203 · syncAstroBrainNow L210-222 · syncAstroBrain L224-229 · syncAstroBrainQuietly L232-244 · syncAstroNameQuietly L247-255
-- `AstroCustomizer.tsx` (155) — Edits apply live: the preview and every other Astro read the same stored prefs.
-  AstroCustomizer L28-49 · AstroCustomizerFields L52-81 · AstroLookFields L83-130 · Field L132-139 · Swatch L141-155
-- `astroFace.test.ts` (61)
-- `astroFace.ts` (165) — Astro's LED face, described in 0..1 visor coordinates and rasterized onto a dot grid,
-  AstroState L4 · AstroMouthStyle L5 · AstroReaction L6 · AstroFaceInput L8-19 · MouthShape L21-25 · Pen L41 · createPen L43-63 · rect L66-78 · tub L81-89 · wave L92-100 · drawMouth L102-112 · drawWork L115-121 · drawEyes L123-143 · rasterAstroFace L146-159 · astroLookStep L162-165
-- `astroFaceController.ts` (241) — Canvas size in CSS pixels.
-  AstroFaceOptions L9-22 · drawDots L26-48 · drawFringe L50-57 · fillDot L59-63 · mountAstroFace L69-119 · Later L121 · scheduleBlink L123-136 · watchGaze L139-164 · ReactionState L166-170 · watchReactions L172-211 · listenAll L213-222 · watchComposerTyping L225-241
-- `AstroHero.tsx` (85) — Static, very faint dot pattern; faded at the edges so it never sits under the heading's ends.
-  useSyncAstroBrainOnce L18-31 · AstroHero L34-52 · AstroOrbit L55-75 · AstroGreeting L78-85
-- `AstronaveLogo.tsx` (21) — The app mark next to the wordmark: a small rocket climbing at 45 degrees, one color.
-  AstronaveLogo L2-21
-- `AstroOnboarding.tsx` (86) — First launch meets Astro before the welcome; afterwards it renders the welcome as is.
+- `AstroBrainEditor.tsx` (197)
+  BrainEditorProps L16-25 · useBrainEditor L26-47 · BrainEditorState L49 · BrainTextEditor L51-66 · EditorActions L68-92 · ShortMemoryCounter L95-104 · ConflictNotice L106-121 · NoticeButton L123-131 · VersionsMenu L132-156 · VersionItems L158-186 · useVersionLabel L187-196
+- `AstroBrainEditors.tsx` (307)
+  BrainEditorSkeleton L24-34 · useBrainFileContents L35-49 · BrainFileSection L51-81 · ReadFailed L83-89 · SkillList L91-93 · useSkillFiles L94-107 · SkillsSection L109-122 · SkillsSkeleton L124-131 · SkillsBody L133-150 · NoSkills L152-158 · SkillRows L160-171 · UnreadableSkills L173-184 · ReadError L185-192 · RetryButton L194-200 · SkillRow L202-234 · Chevron L236-244 · ArchiveView L245-265 · ArchiveContents L267-279 · ArchiveSkeleton L281-288 · ArchiveFiles L290-306
+- `AstroCustomizer.tsx` (162)
+  AstroCustomizer L28-51 · AstroCustomizerFields L52-87 · AstroLookFields L89-136 · Field L138-145 · Swatch L147-161
+- `AstroHero.tsx` (86) — Static, very faint dot pattern; faded at the edges so it never sits under the heading's ends.
+  useSyncAstroBrainOnce L18-33 · AstroHero L34-54 · AstroOrbit L55-77 · AstroGreeting L78-85
+- `AstroOnboarding.tsx` (87) — First launch meets Astro before the welcome; afterwards it renders the welcome as is.
   AstroOnboardingGate L14-25 · AstroOnboarding L27-49 · AboutField L51-68 · queueAbout L70-73 · OnboardingHeader L75-86
-- `astroPrefs.ts` (108) — Visor boxes are measured on each 1024 px suit photo.
-  ASTRO_SUITS L20-35 · ASTRO_LEDS L37-43 · ASTRO_MOUTHS L45-50 · keysOf L52 · AstroPrefs L64 · useAstroPrefs L78-80 · readAstroPrefs L83-89 · updateAstroPrefs L91-93 · withoutPendingAbout L96-100 · astroDisplayName L102-104 · isAstroOnboarded L106-108
-- `AstroSettingsPanel.tsx` (96) — Opening the page refreshes the brain files, then every section reads from the same root.
-  BrainState L13 · useAstroBrainTarget L16-38 · AstroSettingsPanel L40-63 · AstroBrainSections L65-96
-- `useAstroEnvironmentId.ts` (6) — Astro lives where project-less chats run: the primary (local) environment when it can.
+- `AstroSettingsPanel.tsx` (97) — Opening the page refreshes the brain files, then every section reads from the same root.
+  BrainState L13-15 · useAstroBrainTarget L16-38 · AstroSettingsPanel L40-63 · AstroBrainSections L65-96
+- `AstronaveLogo.tsx` (22) — The app mark next to the wordmark: a small rocket climbing at 45 degrees, one color.
+  AstronaveLogo L2-21
+- `astroBrain.test.ts` (215)
+- `astroBrain.ts` (285) — Astro's "brain": files in the scratch root that every project-less chat inherits, because
+  ASTRO_PERSONA_FILE L7 · ASTRO_USER_FILE L8 · ASTRO_MEMORY_FILE L9 · ASTRO_SKILLS_DIR L10 · ASTRO_USER_ARCHIVE L12 · ASTRO_MEMORY_ARCHIVE L13-15 · ASTRO_SHORT_MEMORY_LIMIT L16-18 · ASTRO_VERSIONED_FILES L25-30 · ASTRO_SEED_FILES L39-46 · astroManagedText L77-81 · AstroBrainWrite L82-88 · AstroOverflowMove L89-97 · AstroBrainAction L99 · BrainContents L101-103 · planAstroBrainWrites L104-120 · planManagedWrites L121-128 · astroManagedPaths L130-132 · planOverflow L134-148 · archiveForMove L149-164 · splitOverflow L165-182 · appendToArchive L184-189 · hasArchiveContent L190-194 · ASTRO_VERSION_LIMIT L195 · AstroVersion L197-200 · astroVersionsPath L202-206 · parseVersions L207-219 · isAstroVersion L221-231 · addVersion L232-239 · serializeVersions L241-243 · astroBrainPaths L245-249 · +3 more
+- `astroBrainFiles.ts` (256)
+  AstroBrainTarget L28-31 · AstroSkillFile L33-39 · openAstroBrain L52-63 · readBrainFile L64-78 · writeBrainFile L80-97 · listSkillFiles L98-117 · readSkill L119-126 · snapshotBrainFile L127-139 · listBrainVersions L140-151 · saveBrainFile L152-165 · readBrainContents L167-173 · applyBrainAction L175-182 · applyOverflowMove L183-193 · appendPendingAbout L194-209 · syncAstroBrainNow L210-222 · syncAstroBrain L224-231 · syncAstroBrainQuietly L232-246 · syncAstroNameQuietly L247-255
+- `astroFace.test.ts` (62)
+- `astroFace.ts` (166) — Astro's LED face, described in 0..1 visor coordinates and rasterized onto a dot grid,
+  AstroState L4 · AstroMouthStyle L5 · AstroReaction L6 · AstroFaceInput L8-19 · MouthShape L21-25 · Pen L41 · createPen L43-65 · rect L66-80 · tub L81-91 · wave L92-100 · drawMouth L102-114 · drawWork L115-121 · drawEyes L123-145 · rasterAstroFace L146-161 · astroLookStep L162-165
+- `astroFaceController.ts` (242) — Canvas size in CSS pixels.
+  AstroFaceOptions L9-22 · drawDots L26-48 · drawFringe L50-57 · fillDot L59-68 · mountAstroFace L69-119 · Later L121 · scheduleBlink L123-138 · watchGaze L139-164 · ReactionState L166-170 · watchReactions L172-211 · listenAll L213-224 · watchComposerTyping L225-241
+- `astroPrefs.ts` (109)
+  ASTRO_SUITS L20-35 · ASTRO_LEDS L37-43 · ASTRO_MOUTHS L45-50 · keysOf L52 · AstroPrefs L64 · useAstroPrefs L78-82 · readAstroPrefs L83-89 · updateAstroPrefs L91-95 · withoutPendingAbout L96-100 · astroDisplayName L102-104 · isAstroOnboarded L106-108
+- `useAstroEnvironmentId.ts` (7) — Astro lives where project-less chats run: the primary (local) environment when it can.
   useAstroEnvironmentId L4-6
