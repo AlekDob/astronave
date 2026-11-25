@@ -1553,8 +1553,12 @@
   "fcf506190647304d": "Loading Astro's skills",
   "56aa4fd5a7f1e354": "Loading the archive",
   "6bf0a4240e2ad1a9": "Could not read this file. Try again later.",
+  "0d76f2d60994e724": "Could not read the skills. Try again.",
   "ad60e5f76af4b7c4": "No skills yet. Astro creates one when it learns to do something new.",
+  "efd04b56c29d089e": "Some skills could not be read.",
+  "9bbecec926c3b695": "Tentar novamente",
   "c6e1d4f94545dc5a": "Archive",
+  "b0543326ed7de656": "Could not read the archive. Try again.",
   "15a53e5fcf2b2fdb": "Nothing in the archive yet.",
   "da95aff9277d0171": "Mouth",
   "ffdbc9290ec407fe": "Your Astro",
@@ -1573,10 +1577,10 @@
     ". Where do we start?"
   ],
   "680358224f19b05f": "E.g. I'm a teacher and I want to make a website for my class.",
+  "77b5f98f1f9a4ca7": "Próximo",
+  "4bd4776384d58da5": "Two lines about you (optional)",
   "c9db298d2c887893": "Create your Astro",
   "cbdd573f3ad4ed61": "Your companion for chats without a project. You can change it later in Settings.",
-  "4bd4776384d58da5": "Two lines about you (optional)",
-  "77b5f98f1f9a4ca7": "Próximo",
   "03366a2a46297737": "Look",
   "1a9ca528afa05922": "Who Astro is",
   "af856544effb79e8": "How Astro talks and behaves in chats without a project. Only you write this.",
@@ -3912,7 +3916,6 @@
       "v": "v"
     }
   ],
-  "9bbecec926c3b695": "Tentar novamente",
   "4fd8927b7afc2a92": "Copiar mensagem",
   "6f8651e48261911a": "Raciocínio",
   "ac511f991a3c1fab": "Pesquisa na web",

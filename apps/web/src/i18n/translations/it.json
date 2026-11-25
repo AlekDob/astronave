@@ -1553,8 +1553,12 @@
   "fcf506190647304d": "Carico le abilità di Astro",
   "56aa4fd5a7f1e354": "Carico l'archivio",
   "6bf0a4240e2ad1a9": "Non riesco a leggere questo file. Riprova più tardi.",
+  "0d76f2d60994e724": "Non riesco a leggere le abilità. Riprova.",
   "ad60e5f76af4b7c4": "Ancora nessuna abilità. Astro ne crea una quando impara a fare qualcosa di nuovo.",
+  "efd04b56c29d089e": "Alcune abilità non si riescono a leggere.",
+  "9bbecec926c3b695": "Riprova",
   "c6e1d4f94545dc5a": "Archivio",
+  "b0543326ed7de656": "Non riesco a leggere l'archivio. Riprova.",
   "15a53e5fcf2b2fdb": "Ancora niente in archivio.",
   "da95aff9277d0171": "Bocca",
   "ffdbc9290ec407fe": "Il tuo Astro",
@@ -1573,10 +1577,10 @@
     ". Da dove partiamo?"
   ],
   "680358224f19b05f": "Es. Faccio l'insegnante e voglio creare un sito per la mia classe.",
+  "77b5f98f1f9a4ca7": "Avanti",
+  "4bd4776384d58da5": "Due righe su di te (facoltativo)",
   "c9db298d2c887893": "Crea il tuo Astro",
   "cbdd573f3ad4ed61": "Il tuo compagno per le chat senza progetto. Puoi cambiarlo quando vuoi in Impostazioni.",
-  "4bd4776384d58da5": "Due righe su di te (facoltativo)",
-  "77b5f98f1f9a4ca7": "Avanti",
   "03366a2a46297737": "Aspetto",
   "1a9ca528afa05922": "Chi è Astro",
   "af856544effb79e8": "Come parla e si comporta Astro nelle chat senza progetto. Lo scrivi solo tu.",
@@ -3912,7 +3916,6 @@
       "v": "v"
     }
   ],
-  "9bbecec926c3b695": "Riprova",
   "4fd8927b7afc2a92": "Copia messaggio",
   "6f8651e48261911a": "Ragionamento",
   "ac511f991a3c1fab": "Ricerca sul web",

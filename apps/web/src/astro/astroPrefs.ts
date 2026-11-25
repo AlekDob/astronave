@@ -1,7 +1,11 @@
 import * as Schema from "effect/Schema";
 import { msg } from "gt-react";
 
-import { useLocalStorage } from "~/hooks/useLocalStorage";
+import {
+  getLocalStorageItem,
+  useLocalStorage,
+  writeLocalStorageValue,
+} from "~/hooks/useLocalStorage";
 import suitArancio from "./suits/suit-arancio.webp";
 import suitBianco from "./suits/suit-bianco.webp";
 import suitBlu from "./suits/suit-blu.webp";
@@ -54,6 +58,8 @@ const AstroPrefsSchema = Schema.Struct({
   mouth: Schema.Literals(keysOf(ASTRO_MOUTHS)),
   // Prefs saved before onboarding existed have no field: those people already met Astro.
   onboarded: Schema.optional(Schema.Boolean),
+  // Onboarding's "two lines about you", kept here until a sync appends them to USER.md.
+  pendingAbout: Schema.optional(Schema.String),
 });
 export type AstroPrefs = typeof AstroPrefsSchema.Type;
 
@@ -67,8 +73,30 @@ const DEFAULT_PREFS: AstroPrefs = {
 };
 
 /** Per device, like the theme: Astro's look is a personal taste, not account data. */
+const PREFS_KEY = "astronave:astro";
+
 export function useAstroPrefs() {
-  return useLocalStorage("astronave:astro", DEFAULT_PREFS, AstroPrefsSchema);
+  return useLocalStorage(PREFS_KEY, DEFAULT_PREFS, AstroPrefsSchema);
+}
+
+/** For code outside React (brain sync); hooks reading the prefs re-render on writes. */
+export function readAstroPrefs(): AstroPrefs {
+  try {
+    return getLocalStorageItem(PREFS_KEY, AstroPrefsSchema) ?? DEFAULT_PREFS;
+  } catch {
+    return DEFAULT_PREFS;
+  }
+}
+
+export function updateAstroPrefs(update: (prefs: AstroPrefs) => AstroPrefs): void {
+  writeLocalStorageValue(PREFS_KEY, update, DEFAULT_PREFS, AstroPrefsSchema);
+}
+
+/** Clears the queued text only if it is still the one that was appended. */
+export function withoutPendingAbout(prefs: AstroPrefs, appended: string): AstroPrefs {
+  if (prefs.pendingAbout !== appended) return prefs;
+  const { pendingAbout: _appended, ...rest } = prefs;
+  return rest;
 }
 
 export function astroDisplayName(prefs: AstroPrefs): string {

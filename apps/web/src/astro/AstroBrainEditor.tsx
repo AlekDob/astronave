@@ -1,12 +1,13 @@
-import { T, useGT, useLocale, Var } from "gt-react";
+import { msg, T, useGT, useLocale, Var } from "gt-react";
 import { HistoryIcon } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from "~/components/ui/menu";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Textarea } from "~/components/ui/textarea";
 import { toastManager } from "~/components/ui/toast";
+import { m } from "~/i18n/messages";
 import { ASTRO_SHORT_MEMORY_LIMIT, type AstroVersion } from "./astroBrain";
 import { type AstroBrainTarget, listBrainVersions, saveBrainFile } from "./astroBrainFiles";
 
@@ -23,7 +24,6 @@ interface BrainEditorProps {
 
 /** `loaded` is what the file held when we last read or wrote it: the base for conflict checks. */
 function useBrainEditor(props: BrainEditorProps) {
-  const gt = useGT();
   const [loaded, setLoaded] = useState(props.initial);
   const [draft, setDraft] = useState(props.initial);
   const [saving, setSaving] = useState(false);
@@ -35,7 +35,7 @@ function useBrainEditor(props: BrainEditorProps) {
         setConflict(current);
         if (current === null) setLoaded(draft);
       })
-      .catch(() => toastManager.add({ type: "error", title: gt("Could not save") }))
+      .catch(() => toastManager.add({ type: "error", title: m(msg("Could not save")) }))
       .finally(() => setSaving(false));
   };
   const reload = (current: string) => {
@@ -45,6 +45,8 @@ function useBrainEditor(props: BrainEditorProps) {
   };
   return { draft, setDraft, saving, conflict, dirty: draft !== loaded, run, loaded, reload };
 }
+
+type BrainEditorState = ReturnType<typeof useBrainEditor>;
 
 export function BrainTextEditor(props: BrainEditorProps) {
   const editor = useBrainEditor(props);
@@ -57,27 +59,32 @@ export function BrainTextEditor(props: BrainEditorProps) {
         onChange={(event) => editor.setDraft(event.target.value)}
       />
       {props.counter ? <ShortMemoryCounter length={editor.draft.length} /> : null}
-      {editor.conflict === null ? null : (
-        <ConflictNotice
-          disabled={editor.saving}
-          onReload={() => editor.reload(editor.conflict ?? "")}
-          onOverwrite={() => editor.run(editor.conflict ?? "")}
-        />
-      )}
-      <div className="flex items-center justify-end gap-2">
-        <VersionsMenu
-          target={props.target}
-          relativePath={props.relativePath}
-          onPick={editor.setDraft}
-        />
-        <Button
-          size="sm"
-          disabled={!editor.dirty || editor.saving}
-          onClick={() => editor.run(editor.loaded)}
-        >
-          <T>Save</T>
-        </Button>
-      </div>
+      {editor.conflict === null ? null : <ConflictNotice editor={editor} />}
+      <EditorActions editor={editor} target={props.target} relativePath={props.relativePath} />
+    </div>
+  );
+}
+
+function EditorActions(props: {
+  editor: BrainEditorState;
+  target: AstroBrainTarget;
+  relativePath: string;
+}) {
+  const { editor } = props;
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <VersionsMenu
+        target={props.target}
+        relativePath={props.relativePath}
+        onPick={editor.setDraft}
+      />
+      <Button
+        size="sm"
+        disabled={!editor.dirty || editor.saving}
+        onClick={() => editor.run(editor.loaded)}
+      >
+        <T>Save</T>
+      </Button>
     </div>
   );
 }
@@ -96,23 +103,28 @@ function ShortMemoryCounter({ length }: { length: number }) {
   );
 }
 
-function ConflictNotice(props: {
-  disabled: boolean;
-  onReload: () => void;
-  onOverwrite: () => void;
-}) {
+function ConflictNotice({ editor }: { editor: BrainEditorState }) {
+  const current = editor.conflict ?? "";
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
       <span className="min-w-0 flex-1">
         <T>Astro changed this file while you were editing it.</T>
       </span>
-      <Button size="sm" variant="outline" disabled={props.disabled} onClick={props.onReload}>
+      <NoticeButton disabled={editor.saving} onClick={() => editor.reload(current)}>
         <T>Reload</T>
-      </Button>
-      <Button size="sm" variant="outline" disabled={props.disabled} onClick={props.onOverwrite}>
+      </NoticeButton>
+      <NoticeButton disabled={editor.saving} onClick={() => editor.run(current)}>
         <T>Overwrite anyway</T>
-      </Button>
+      </NoticeButton>
     </div>
+  );
+}
+
+function NoticeButton(props: { disabled: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <Button size="sm" variant="outline" disabled={props.disabled} onClick={props.onClick}>
+      {props.children}
+    </Button>
   );
 }
 

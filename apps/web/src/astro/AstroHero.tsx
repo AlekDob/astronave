@@ -22,8 +22,11 @@ function useSyncAstroBrainOnce(scratch: boolean) {
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- writes Astro's brain files on the server once per app session
   useEffect(() => {
     if (!scratch || environmentId === null || brainSyncedThisSession) return;
+    // Set while in flight to avoid a double sync; a failure lets the next scratch chat retry.
     brainSyncedThisSession = true;
-    syncAstroBrainQuietly(environmentId, name);
+    void syncAstroBrainQuietly(environmentId, name).then((ok) => {
+      brainSyncedThisSession = ok;
+    });
   }, [scratch, environmentId, name]);
 }
 

@@ -78,48 +78,84 @@ export function astroManagedText(name: string): string {
   return MANAGED_TEMPLATE.replaceAll("{name}", name);
 }
 
+/** Managed files are rewritten; seeds are written only if still missing right before. */
 export interface AstroBrainWrite {
+  readonly kind: "managed" | "seed";
   readonly relativePath: string;
   readonly contents: string;
 }
 
+/** Move the oldest short-memory lines to the archive; planned from `expected`. */
+export interface AstroOverflowMove {
+  readonly kind: "overflow";
+  readonly shortPath: string;
+  readonly archivePath: string;
+  readonly expected: string;
+  readonly kept: string;
+  readonly moved: readonly string[];
+  readonly date: string;
+}
+
+export type AstroBrainAction = AstroBrainWrite | AstroOverflowMove;
+
 type BrainContents = Readonly<Record<string, string | null>>;
 
-/**
- * `existing` maps each brain path to its contents, or null when the file is missing.
- * Order matters: an archive is always written before its short file is shortened.
- */
+/** `existing` maps each brain path to its contents, or null when the file is missing. */
 export function planAstroBrainWrites(
   name: string,
   existing: BrainContents,
   date: string,
-): AstroBrainWrite[] {
-  const managed = astroManagedText(name);
-  const writes: AstroBrainWrite[] = [];
-  for (const relativePath of ASTRO_MANAGED_FILES) {
-    if (existing[relativePath] !== managed) writes.push({ relativePath, contents: managed });
-  }
+): AstroBrainAction[] {
+  const actions: AstroBrainAction[] = planManagedWrites(name, existing);
   for (const [relativePath, contents] of Object.entries(ASTRO_SEED_FILES)) {
-    if (existing[relativePath] == null) writes.push({ relativePath, contents });
+    if (existing[relativePath] == null) actions.push({ kind: "seed", relativePath, contents });
   }
   for (const shortPath of Object.keys(ASTRO_ARCHIVES)) {
-    writes.push(...planOverflow(shortPath, existing, date));
+    const move = planOverflow(shortPath, existing[shortPath] ?? null, date);
+    if (move !== null) actions.push(move);
   }
-  return writes;
+  return actions;
 }
 
-function planOverflow(shortPath: string, existing: BrainContents, date: string): AstroBrainWrite[] {
+/** Only CLAUDE.md / AGENTS.md: enough when just the name changed. */
+export function planManagedWrites(name: string, existing: BrainContents): AstroBrainWrite[] {
+  const contents = astroManagedText(name);
+  return ASTRO_MANAGED_FILES.filter((path) => existing[path] !== contents).map((relativePath) => ({
+    kind: "managed",
+    relativePath,
+    contents,
+  }));
+}
+
+export function astroManagedPaths(): string[] {
+  return [...ASTRO_MANAGED_FILES];
+}
+
+function planOverflow(
+  shortPath: string,
+  expected: string | null,
+  date: string,
+): AstroOverflowMove | null {
+  const split = splitOverflow(expected, ASTRO_SHORT_MEMORY_LIMIT);
+  if (split === null || expected === null) return null;
   const archivePath = ASTRO_ARCHIVES[shortPath] ?? "";
-  const split = splitOverflow(existing[shortPath] ?? null, ASTRO_SHORT_MEMORY_LIMIT);
-  if (split === null) return [];
-  const kept = { relativePath: shortPath, contents: split.kept };
-  // Only blank lines left the file: nothing worth a block in the archive.
-  if (split.moved.length === 0) return [kept];
-  const archive = existing[archivePath] ?? ASTRO_SEED_FILES[archivePath] ?? "";
-  return [
-    { relativePath: archivePath, contents: appendToArchive(archive, split.moved, date) },
-    kept,
-  ];
+  return { kind: "overflow", shortPath, archivePath, expected, ...split, date };
+}
+
+/**
+ * The archive text to write for a planned move, appended to what the archive holds now.
+ * Null when the short file changed since planning: skip this round, the next sync retries.
+ */
+export function archiveForMove(
+  move: AstroOverflowMove,
+  currentShort: string | null,
+  currentArchive: string | null,
+): string | null {
+  if (currentShort !== move.expected) return null;
+  // Only blank lines left the file: the archive stays as it is.
+  if (move.moved.length === 0) return currentArchive ?? "";
+  const base = currentArchive ?? ASTRO_SEED_FILES[move.archivePath] ?? "";
+  return appendToArchive(base, move.moved, move.date);
 }
 
 /**
@@ -231,5 +267,18 @@ export function skillSummary(
   return {
     name: field("name") ?? heading ?? slug,
     description: field("description") ?? firstText ?? "",
+  };
+}
+
+/**
+ * Runs async jobs one after another, so two brain operations of this client never interleave
+ * their reads and writes. A failed job does not stop the ones queued after it.
+ */
+export function createSerialQueue() {
+  let tail: Promise<unknown> = Promise.resolve();
+  return <T>(job: () => Promise<T>): Promise<T> => {
+    const run = tail.then(job, job);
+    tail = run.catch(() => undefined);
+    return run;
   };
 }

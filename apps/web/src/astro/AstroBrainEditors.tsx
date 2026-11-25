@@ -3,6 +3,7 @@ import { ChevronRightIcon } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
 import { SettingsSection } from "~/components/settings/settingsLayout";
+import { Button } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
 import { BrainTextEditor } from "./AstroBrainEditor";
@@ -87,48 +88,114 @@ function ReadFailed() {
   );
 }
 
-function useSkillFiles(target: AstroBrainTarget | null) {
-  const [skills, setSkills] = useState<AstroSkillFile[] | null>(null);
+type SkillList = Awaited<ReturnType<typeof listSkillFiles>>;
+
+/** undefined while loading, null when the folder could not be listed. */
+function useSkillFiles(target: AstroBrainTarget) {
+  const [list, setList] = useState<SkillList | null | undefined>(undefined);
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- lists the skill folders on the server once the scratch project is ready
   useEffect(() => {
-    if (target === null) return;
     let current = true;
     listSkillFiles(target)
-      .then((files) => current && setSkills(files))
-      .catch(() => current && setSkills([]));
+      .then((files) => current && setList(files))
+      .catch(() => current && setList(null));
     return () => {
       current = false;
     };
   }, [target]);
-  return skills;
+  return list;
 }
 
 export function SkillsSection({ target }: { target: AstroBrainTarget | null }) {
   const gt = useGT();
-  const skills = useSkillFiles(target);
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  // Retry remounts the body, which reloads the list.
+  const [attempt, setAttempt] = useState(0);
   return (
     <SettingsSection title={gt("Learned skills")}>
-      {target === null || skills === null ? (
-        <div role="status" aria-label={gt("Loading Astro's skills")} className="px-4 py-3">
-          <Skeleton className="h-10 w-full" />
-        </div>
-      ) : skills.length === 0 ? (
-        <p className="px-4 py-3 text-muted-foreground text-sm">
-          <T>No skills yet. Astro creates one when it learns to do something new.</T>
-        </p>
+      {target === null ? (
+        <SkillsSkeleton />
       ) : (
-        skills.map((skill) => (
-          <SkillRow
-            key={skill.slug}
-            target={target}
-            skill={skill}
-            open={openSlug === skill.slug}
-            onToggle={() => setOpenSlug(openSlug === skill.slug ? null : skill.slug)}
-          />
-        ))
+        <SkillsBody key={attempt} target={target} onRetry={() => setAttempt(attempt + 1)} />
       )}
     </SettingsSection>
+  );
+}
+
+function SkillsSkeleton() {
+  const gt = useGT();
+  return (
+    <div role="status" aria-label={gt("Loading Astro's skills")} className="px-4 py-3">
+      <Skeleton className="h-10 w-full" />
+    </div>
+  );
+}
+
+function SkillsBody(props: { target: AstroBrainTarget; onRetry: () => void }) {
+  const list = useSkillFiles(props.target);
+  if (list === undefined) return <SkillsSkeleton />;
+  if (list === null) {
+    return (
+      <ReadError className="px-4 py-3" onRetry={props.onRetry}>
+        <T>Could not read the skills. Try again.</T>
+      </ReadError>
+    );
+  }
+  if (list.skills.length === 0 && list.unreadable === 0) return <NoSkills />;
+  return (
+    <>
+      <SkillRows target={props.target} skills={list.skills} />
+      {list.unreadable > 0 ? <UnreadableSkills onRetry={props.onRetry} /> : null}
+    </>
+  );
+}
+
+function NoSkills() {
+  return (
+    <p className="px-4 py-3 text-muted-foreground text-sm">
+      <T>No skills yet. Astro creates one when it learns to do something new.</T>
+    </p>
+  );
+}
+
+function SkillRows(props: { target: AstroBrainTarget; skills: readonly AstroSkillFile[] }) {
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  return props.skills.map((skill) => (
+    <SkillRow
+      key={skill.slug}
+      target={props.target}
+      skill={skill}
+      open={openSlug === skill.slug}
+      onToggle={() => setOpenSlug(openSlug === skill.slug ? null : skill.slug)}
+    />
+  ));
+}
+
+function UnreadableSkills({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex items-center gap-2 px-4 py-3 text-muted-foreground text-sm">
+      <span className="min-w-0 flex-1">
+        <T>Some skills could not be read.</T>
+      </span>
+      <RetryButton onRetry={onRetry} />
+    </div>
+  );
+}
+
+/** A failed read must never look like an empty list. */
+function ReadError(props: { className?: string; children: ReactNode; onRetry: () => void }) {
+  return (
+    <div className={cn("flex items-center gap-2 text-sm", props.className)}>
+      <span className="min-w-0 flex-1 text-destructive">{props.children}</span>
+      <RetryButton onRetry={props.onRetry} />
+    </div>
+  );
+}
+
+function RetryButton({ onRetry }: { onRetry: () => void }) {
+  return (
+    <Button size="sm" variant="outline" onClick={onRetry}>
+      <T>Retry</T>
+    </Button>
   );
 }
 
@@ -177,6 +244,7 @@ function Chevron({ open }: { open: boolean }) {
 /** Read-only view of both archives; loaded only when opened. */
 export function ArchiveView({ target }: { target: AstroBrainTarget | null }) {
   const [open, setOpen] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   return (
     <div className="grid gap-2">
       <button
@@ -189,23 +257,37 @@ export function ArchiveView({ target }: { target: AstroBrainTarget | null }) {
         <Chevron open={open} />
         <T>Archive</T>
       </button>
-      {open && target !== null ? <ArchiveContents target={target} /> : null}
+      {open && target !== null ? (
+        <ArchiveContents key={attempt} target={target} onRetry={() => setAttempt(attempt + 1)} />
+      ) : null}
     </div>
   );
 }
 
-function ArchiveContents({ target }: { target: AstroBrainTarget }) {
-  const gt = useGT();
-  const user = useBrainFileContents(target, ASTRO_USER_ARCHIVE);
-  const memory = useBrainFileContents(target, ASTRO_MEMORY_ARCHIVE);
-  if (user === undefined || memory === undefined) {
+function ArchiveContents(props: { target: AstroBrainTarget; onRetry: () => void }) {
+  const user = useBrainFileContents(props.target, ASTRO_USER_ARCHIVE);
+  const memory = useBrainFileContents(props.target, ASTRO_MEMORY_ARCHIVE);
+  if (user === null || memory === null) {
     return (
-      <div role="status" aria-label={gt("Loading the archive")}>
-        <Skeleton shape="card" className="h-24 w-full" />
-      </div>
+      <ReadError onRetry={props.onRetry}>
+        <T>Could not read the archive. Try again.</T>
+      </ReadError>
     );
   }
-  const files = [user, memory].filter((text) => hasArchiveContent(text));
+  if (user === undefined || memory === undefined) return <ArchiveSkeleton />;
+  return <ArchiveFiles files={[user, memory].filter((text) => hasArchiveContent(text))} />;
+}
+
+function ArchiveSkeleton() {
+  const gt = useGT();
+  return (
+    <div role="status" aria-label={gt("Loading the archive")}>
+      <Skeleton shape="card" className="h-24 w-full" />
+    </div>
+  );
+}
+
+function ArchiveFiles({ files }: { files: readonly string[] }) {
   if (files.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">

@@ -13,7 +13,7 @@ import { Label } from "~/components/ui/label";
 import { Toggle, ToggleGroup } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
 import { AstroAvatar, type AstroAvatarSize } from "./AstroAvatar";
-import { syncAstroBrainQuietly } from "./astroBrainFiles";
+import { syncAstroNameQuietly } from "./astroBrainFiles";
 import { useAstroEnvironmentId } from "./useAstroEnvironmentId";
 import {
   ASTRO_LEDS,
@@ -51,8 +51,12 @@ export function AstroCustomizer({
 /** Preview plus look fields; shared by the dialog, Settings > Astro and onboarding. */
 export function AstroCustomizerFields({
   avatarSize = "preview",
+  syncNameOnBlur = true,
 }: {
   avatarSize?: AstroAvatarSize;
+  // Onboarding passes false: opening the brain creates the scratch project, and the home
+  // page then jumps to a draft, unmounting onboarding before "Next".
+  syncNameOnBlur?: boolean;
 }) {
   const [prefs, setPrefs] = useAstroPrefs();
   const environmentId = useAstroEnvironmentId();
@@ -72,7 +76,9 @@ export function AstroCustomizerFields({
           value={prefs.name}
           onChange={(event) => setPrefs((current) => ({ ...current, name: event.target.value }))}
           // The brain files carry the name; rewriting them once per edit, not per keystroke.
-          onBlur={() => syncAstroBrainQuietly(environmentId, astroDisplayName(prefs))}
+          onBlur={() => {
+            if (syncNameOnBlur) syncAstroNameQuietly(environmentId, astroDisplayName(prefs));
+          }}
         />
       </div>
       <AstroLookFields />
