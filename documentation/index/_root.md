@@ -13,8 +13,8 @@ Ranges come from the last refresh: if a symbol moved, Grep for it.
   forkTarballPatches L9-49
 - `AGENTS.md` (158) — T3 Code
   What makes T3 Code special? L7-9 · 1. Open at the core L11-13 · 2. Performance without compromise L15-17 · 3. Remote ready L19-21 · 4. Multi-surface L23-31 · A note from Theo L33-41 · Terminology L43-46 · The three ways to hurt yourself L48-52 · Hit every surface L54-66 · Dev servers and test data L68-76 · Verifying L78-83 · Evals L85-87 · Pull requests L89-97 · Documentation L99-108 · Plans and work artifacts L110-113 · Where code lives L115-122 · Internal docs by area L124-144 · Taste L146-157
-- `ASTRONAVE.md` (63) — Astronave
-  What changes vs upstream L11-19 · Files we touch L21-47 · Nightly sync L49-57 · Still open L59-62
+- `ASTRONAVE.md` (64) — Astronave
+  What changes vs upstream L11-19 · Files we touch L21-48 · Nightly sync L50-58 · Still open L60-63
 - `CLAUDE.md` (2)
 - `CONTRIBUTING.md` (144) — Contributing
   The best way to help L38-50 · Rules for a PR L52-58 · Fix a bug L60-78 · One problem per PR L80-85 · Show that it works L87-94 · Models we do not accept L96-105 · 3 open PRs per person L107-112 · Keep your PR mergeable L114-120 · Bans L122-131 · When your PR is closed L133-139 · Setup L141-143
