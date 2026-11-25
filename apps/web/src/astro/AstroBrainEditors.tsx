@@ -1,23 +1,23 @@
 import { T, useGT } from "gt-react";
 import { ChevronRightIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { SettingsSection } from "~/components/settings/settingsLayout";
-import { Button } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
-import { Textarea } from "~/components/ui/textarea";
-import { toastManager } from "~/components/ui/toast";
 import { cn } from "~/lib/utils";
-import { skillSummary } from "./astroBrain";
+import { BrainTextEditor } from "./AstroBrainEditor";
+import {
+  ASTRO_MEMORY_ARCHIVE,
+  ASTRO_USER_ARCHIVE,
+  hasArchiveContent,
+  skillSummary,
+} from "./astroBrain";
 import {
   type AstroBrainTarget,
   type AstroSkillFile,
   listSkillFiles,
   readBrainFile,
-  writeBrainFile,
 } from "./astroBrainFiles";
-
-const EDITOR_ROWS = 6;
 
 /** Same footprint as a loaded editor (textarea + Save row), so the page does not jump. */
 function BrainEditorSkeleton() {
@@ -26,38 +26,6 @@ function BrainEditorSkeleton() {
     <div role="status" aria-label={gt("Loading Astro's memory")} className="grid gap-2">
       <Skeleton shape="card" className="h-[152px] w-full" />
       <Skeleton className="ml-auto h-8 w-16" />
-    </div>
-  );
-}
-
-function BrainTextEditor(props: {
-  target: AstroBrainTarget;
-  relativePath: string;
-  initial: string;
-  label: string;
-}) {
-  const gt = useGT();
-  const [saved, setSaved] = useState(props.initial);
-  const [draft, setDraft] = useState(props.initial);
-  const [saving, setSaving] = useState(false);
-  const save = () => {
-    setSaving(true);
-    writeBrainFile(props.target, props.relativePath, draft)
-      .then(() => setSaved(draft))
-      .catch(() => toastManager.add({ type: "error", title: gt("Could not save") }))
-      .finally(() => setSaving(false));
-  };
-  return (
-    <div className="grid gap-2">
-      <Textarea
-        aria-label={props.label}
-        rows={EDITOR_ROWS}
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-      />
-      <Button size="sm" className="ml-auto" disabled={draft === saved || saving} onClick={save}>
-        <T>Save</T>
-      </Button>
     </div>
   );
 }
@@ -84,6 +52,8 @@ export function BrainFileSection(props: {
   relativePath: string;
   title: string;
   help: string;
+  counter?: boolean;
+  children?: ReactNode;
 }) {
   const contents = useBrainFileContents(props.target, props.relativePath);
   return (
@@ -100,8 +70,10 @@ export function BrainFileSection(props: {
             relativePath={props.relativePath}
             initial={contents}
             label={props.title}
+            counter={props.counter ?? false}
           />
         )}
+        {props.children}
       </div>
     </SettingsSection>
   );
@@ -175,9 +147,7 @@ function SkillRow(props: {
         onClick={props.onToggle}
         className="flex w-full cursor-pointer items-center gap-2 px-4 py-3 text-left outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
-        <ChevronRightIcon
-          className={cn("size-4 shrink-0 text-muted-foreground", props.open && "rotate-90")}
-        />
+        <Chevron open={props.open} />
         <span className="min-w-0 flex-1">
           <span className="block font-medium text-sm">{name}</span>
           <span className="block truncate text-muted-foreground text-xs">{description}</span>
@@ -194,4 +164,61 @@ function SkillRow(props: {
       </div>
     </div>
   );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <ChevronRightIcon
+      className={cn("size-4 shrink-0 text-muted-foreground", open && "rotate-90")}
+    />
+  );
+}
+
+/** Read-only view of both archives; loaded only when opened. */
+export function ArchiveView({ target }: { target: AstroBrainTarget | null }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="grid gap-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        disabled={target === null}
+        onClick={() => setOpen(!open)}
+        className="flex w-fit cursor-pointer items-center gap-1 rounded-sm text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+      >
+        <Chevron open={open} />
+        <T>Archive</T>
+      </button>
+      {open && target !== null ? <ArchiveContents target={target} /> : null}
+    </div>
+  );
+}
+
+function ArchiveContents({ target }: { target: AstroBrainTarget }) {
+  const gt = useGT();
+  const user = useBrainFileContents(target, ASTRO_USER_ARCHIVE);
+  const memory = useBrainFileContents(target, ASTRO_MEMORY_ARCHIVE);
+  if (user === undefined || memory === undefined) {
+    return (
+      <div role="status" aria-label={gt("Loading the archive")}>
+        <Skeleton shape="card" className="h-24 w-full" />
+      </div>
+    );
+  }
+  const files = [user, memory].filter((text) => hasArchiveContent(text));
+  if (files.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        <T>Nothing in the archive yet.</T>
+      </p>
+    );
+  }
+  return files.map((text) => (
+    <pre
+      key={text}
+      className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-3 font-sans text-xs"
+    >
+      {text}
+    </pre>
+  ));
 }

@@ -4,11 +4,17 @@ import type { EnvironmentId } from "@t3tools/contracts";
 import { appAtomRegistry } from "~/rpc/atomRegistry";
 import { projectEnvironment } from "~/state/projects";
 import {
+  addVersion,
   appendAboutUser,
   ASTRO_SKILLS_DIR,
   ASTRO_USER_FILE,
+  ASTRO_VERSIONED_FILES,
+  type AstroVersion,
   astroBrainPaths,
+  astroVersionsPath,
+  parseVersions,
   planAstroBrainWrites,
+  serializeVersions,
 } from "./astroBrain";
 
 /** The scratch project: its root is the parent of every project-less chat folder. */
@@ -52,7 +58,7 @@ export async function readBrainFile(
   return result.value.exists === false ? null : result.value.contents;
 }
 
-export async function writeBrainFile(
+async function writeBrainFile(
   target: AstroBrainTarget,
   relativePath: string,
   contents: string,
@@ -89,7 +95,51 @@ export async function listSkillFiles(target: AstroBrainTarget): Promise<AstroSki
   return skills.filter((skill) => skill !== null).toSorted((a, b) => a.slug.localeCompare(b.slug));
 }
 
-/** Rewrites the app-managed files and seeds the missing ones; never touches what the user wrote. */
+const today = () => new Date().toISOString().slice(0, 10);
+
+/** Keeps `content` in the path's history unless it is already the latest version. */
+async function snapshotBrainFile(
+  target: AstroBrainTarget,
+  relativePath: string,
+  content: string | null,
+): Promise<void> {
+  if (content === null) return;
+  const versionsPath = astroVersionsPath(relativePath);
+  const versions = parseVersions(await readBrainFile(target, versionsPath));
+  const next = addVersion(versions, content, new Date().toISOString());
+  if (next !== null) await writeBrainFile(target, versionsPath, serializeVersions(next));
+}
+
+/** Newest first. */
+export async function listBrainVersions(
+  target: AstroBrainTarget,
+  relativePath: string,
+): Promise<AstroVersion[]> {
+  const text = await readBrainFile(target, astroVersionsPath(relativePath));
+  return parseVersions(text).toReversed();
+}
+
+/**
+ * Saves only if the file still holds `expected` (Astro may have edited it meanwhile).
+ * Returns the file's current text on a conflict, null once saved.
+ */
+export async function saveBrainFile(
+  target: AstroBrainTarget,
+  relativePath: string,
+  contents: string,
+  expected: string,
+): Promise<string | null> {
+  const current = await readBrainFile(target, relativePath);
+  if ((current ?? "") !== expected) return current ?? "";
+  await snapshotBrainFile(target, relativePath, current);
+  await writeBrainFile(target, relativePath, contents);
+  return null;
+}
+
+/**
+ * Rewrites the app-managed files, seeds the missing ones and moves short-memory overflow to the
+ * archive. Snapshots first, so Astro's own edits since last time land in the history.
+ */
 export async function syncAstroBrain(
   environmentId: EnvironmentId,
   name: string,
@@ -98,7 +148,11 @@ export async function syncAstroBrain(
   const paths = astroBrainPaths();
   const contents = await Promise.all(paths.map((path) => readBrainFile(target, path)));
   const existing = Object.fromEntries(paths.map((path, index) => [path, contents[index] ?? null]));
-  for (const write of planAstroBrainWrites(name, existing)) {
+  for (const path of ASTRO_VERSIONED_FILES) {
+    await snapshotBrainFile(target, path, existing[path] ?? null);
+  }
+  // The snapshots above already hold what an overflow write replaces.
+  for (const write of planAstroBrainWrites(name, existing, today())) {
     await writeBrainFile(target, write.relativePath, write.contents);
   }
   return target;
@@ -123,8 +177,8 @@ export function finishAstroOnboarding(
     const target = await syncAstroBrain(environmentId, name);
     if (about.trim() === "") return;
     const current = await readBrainFile(target, ASTRO_USER_FILE);
-    const today = new Date().toISOString().slice(0, 10);
-    await writeBrainFile(target, ASTRO_USER_FILE, appendAboutUser(current, about, today));
+    await snapshotBrainFile(target, ASTRO_USER_FILE, current);
+    await writeBrainFile(target, ASTRO_USER_FILE, appendAboutUser(current, about, today()));
   };
   run().catch((error: unknown) =>
     console.warn("[astro] Could not finish Astro's onboarding files.", error),

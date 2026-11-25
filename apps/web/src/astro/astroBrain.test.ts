@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import {
+  addVersion,
   appendAboutUser,
+  appendToArchive,
+  ASTRO_MEMORY_ARCHIVE,
+  ASTRO_MEMORY_FILE,
+  ASTRO_SHORT_MEMORY_LIMIT,
+  ASTRO_VERSION_LIMIT,
+  astroVersionsPath,
+  parseVersions,
+  serializeVersions,
+  splitOverflow,
   ASTRO_PERSONA_FILE,
   ASTRO_SEED_FILES,
   ASTRO_USER_FILE,
@@ -11,11 +21,12 @@ import {
   skillSummary,
 } from "./astroBrain";
 
+const DATE = "2026-11-25";
 const missing = () => Object.fromEntries(astroBrainPaths().map((path) => [path, null]));
 
 describe("planAstroBrainWrites", () => {
   it("writes every file on a fresh scratch root, with the name filled in", () => {
-    const writes = planAstroBrainWrites("Luna", missing());
+    const writes = planAstroBrainWrites("Luna", missing(), DATE);
     expect(writes.map((write) => write.relativePath).toSorted()).toEqual(
       astroBrainPaths().toSorted(),
     );
@@ -32,7 +43,7 @@ describe("planAstroBrainWrites", () => {
       "CLAUDE.md": astroManagedText("Luna"),
       "AGENTS.md": "edited by hand",
     };
-    expect(planAstroBrainWrites("Luna", existing)).toEqual([
+    expect(planAstroBrainWrites("Luna", existing, DATE)).toEqual([
       { relativePath: "AGENTS.md", contents: astroManagedText("Luna") },
     ]);
   });
@@ -44,7 +55,7 @@ describe("planAstroBrainWrites", () => {
       "AGENTS.md": astroManagedText("Astro"),
       [ASTRO_PERSONA_FILE]: null,
     };
-    expect(planAstroBrainWrites("Astro", existing)).toEqual([
+    expect(planAstroBrainWrites("Astro", existing, DATE)).toEqual([
       { relativePath: ASTRO_PERSONA_FILE, contents: ASTRO_SEED_FILES[ASTRO_PERSONA_FILE] },
     ]);
   });
@@ -70,5 +81,82 @@ describe("skillSummary", () => {
       description: "Quando servono foto.",
     });
     expect(skillSummary("slug", "")).toEqual({ name: "slug", description: "" });
+  });
+});
+
+const contentLines = (text: string) =>
+  text.split("\n").filter((line) => line.trim() !== "" && !line.startsWith("<!--"));
+
+describe("splitOverflow", () => {
+  const memory = `# Memoria\n${Array.from({ length: 80 }, (_, i) => `- fatto numero ${i} da ricordare`).join("\n")}\n`;
+
+  it("keeps the header, moves the oldest lines and loses none", () => {
+    const split = splitOverflow(memory, ASTRO_SHORT_MEMORY_LIMIT);
+    expect(split).not.toBeNull();
+    if (split === null) return;
+    expect(split.kept.length).toBeLessThanOrEqual(ASTRO_SHORT_MEMORY_LIMIT);
+    expect(split.kept.startsWith("# Memoria\n- fatto numero ")).toBe(true);
+    expect(split.kept.endsWith("\n")).toBe(true);
+    expect(split.moved[0]).toBe("- fatto numero 0 da ricordare");
+    expect([...split.moved, ...contentLines(split.kept)].toSorted()).toEqual(
+      contentLines(memory).toSorted(),
+    );
+  });
+
+  it("does nothing under the limit", () => {
+    expect(splitOverflow("# Memoria\n- uno\n", ASTRO_SHORT_MEMORY_LIMIT)).toBeNull();
+    expect(splitOverflow(null, ASTRO_SHORT_MEMORY_LIMIT)).toBeNull();
+  });
+
+  it("writes the archive before shortening the memory, appending in order", () => {
+    const existing = {
+      ...Object.fromEntries(astroBrainPaths().map((path) => [path, "x"])),
+      "CLAUDE.md": astroManagedText("Astro"),
+      "AGENTS.md": astroManagedText("Astro"),
+      [ASTRO_MEMORY_FILE]: memory,
+      [ASTRO_MEMORY_ARCHIVE]: "# Archivio\n- vecchio\n",
+    };
+    const writes = planAstroBrainWrites("Astro", existing, DATE);
+    expect(writes.map((write) => write.relativePath)).toEqual([
+      ASTRO_MEMORY_ARCHIVE,
+      ASTRO_MEMORY_FILE,
+    ]);
+    const archive = writes[0]?.contents ?? "";
+    expect(archive.startsWith("# Archivio\n- vecchio\n<!-- spostate il 2026-11-25 -->\n")).toBe(
+      true,
+    );
+    expect(contentLines(archive).length + contentLines(writes[1]?.contents ?? "").length).toBe(
+      contentLines(memory).length + 2,
+    );
+  });
+
+  it("appendToArchive adds a dated block", () => {
+    expect(appendToArchive("# A", ["- uno", "- due"], DATE)).toBe(
+      "# A\n<!-- spostate il 2026-11-25 -->\n- uno\n- due\n",
+    );
+  });
+});
+
+describe("versions", () => {
+  it("records only changes and keeps the last 30", () => {
+    expect(addVersion([], "a", "t0")).toEqual([{ at: "t0", content: "a" }]);
+    expect(addVersion([{ at: "t0", content: "a" }], "a", "t1")).toBeNull();
+    const many = Array.from({ length: ASTRO_VERSION_LIMIT }, (_, i) => ({
+      at: `t${i}`,
+      content: `v${i}`,
+    }));
+    const next = addVersion(many, "new", "tn") ?? [];
+    expect(next).toHaveLength(ASTRO_VERSION_LIMIT);
+    expect(next[0]?.content).toBe("v1");
+    expect(next.at(-1)).toEqual({ at: "tn", content: "new" });
+  });
+
+  it("round-trips JSONL and skips broken lines", () => {
+    const versions = [{ at: "t0", content: 'riga\n"due"' }];
+    expect(parseVersions(`${serializeVersions(versions)}{broken\n`)).toEqual(versions);
+    expect(parseVersions(null)).toEqual([]);
+    expect(astroVersionsPath("astro/skills/x/SKILL.md")).toBe(
+      "astro/versioni/astro__skills__x__SKILL.md.jsonl",
+    );
   });
 });

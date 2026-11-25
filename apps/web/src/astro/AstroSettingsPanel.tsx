@@ -3,7 +3,7 @@ import { T, useGT } from "gt-react";
 import { useEffect, useEffectEvent, useState } from "react";
 
 import { SettingsPageContainer, SettingsSection } from "~/components/settings/settingsLayout";
-import { BrainFileSection, SkillsSection } from "./AstroBrainEditors";
+import { ArchiveView, BrainFileSection, SkillsSection } from "./AstroBrainEditors";
 import { ASTRO_MEMORY_FILE, ASTRO_PERSONA_FILE, ASTRO_USER_FILE } from "./astroBrain";
 import { type AstroBrainTarget, syncAstroBrain } from "./astroBrainFiles";
 import { AstroCustomizerFields } from "./AstroCustomizer";
@@ -77,6 +77,7 @@ function AstroBrainSections({ target }: { target: AstroBrainTarget | null }) {
         relativePath={ASTRO_USER_FILE}
         title={gt("What Astro knows about you")}
         help={gt("Astro adds what it learns about you. You can correct it whenever you want.")}
+        counter
       />
       <BrainFileSection
         target={target}
@@ -85,7 +86,10 @@ function AstroBrainSections({ target }: { target: AstroBrainTarget | null }) {
         help={gt(
           "Astro updates it on its own when it learns something. You can correct it whenever you want.",
         )}
-      />
+        counter
+      >
+        <ArchiveView target={target} />
+      </BrainFileSection>
       <SkillsSection target={target} />
     </>
   );
