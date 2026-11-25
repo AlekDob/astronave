@@ -361,7 +361,7 @@ export function DraftHeroHeadline({
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center">
       {/* Astronave: Astro and its greeting on every new chat. */}
-      <AstroHero />
+      <AstroHero scratch={isScratchDraft} />
       {hasResolvedProject && !isScratchDraft ? (
         <DraftHeroProjectHeading projectName={activeProjectTitle ?? gt("Choose a project")}>
           {projectSelector}

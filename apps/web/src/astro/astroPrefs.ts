@@ -52,6 +52,8 @@ const AstroPrefsSchema = Schema.Struct({
   suit: Schema.Literals(keysOf(ASTRO_SUITS)),
   led: Schema.Literals(keysOf(ASTRO_LEDS)),
   mouth: Schema.Literals(keysOf(ASTRO_MOUTHS)),
+  // Prefs saved before onboarding existed have no field: those people already met Astro.
+  onboarded: Schema.optional(Schema.Boolean),
 });
 export type AstroPrefs = typeof AstroPrefsSchema.Type;
 
@@ -61,6 +63,7 @@ const DEFAULT_PREFS: AstroPrefs = {
   suit: "blu",
   led: "bianco-blu",
   mouth: "sito",
+  onboarded: false,
 };
 
 /** Per device, like the theme: Astro's look is a personal taste, not account data. */
@@ -70,4 +73,8 @@ export function useAstroPrefs() {
 
 export function astroDisplayName(prefs: AstroPrefs): string {
   return prefs.name.trim() || DEFAULT_NAME;
+}
+
+export function isAstroOnboarded(prefs: AstroPrefs): boolean {
+  return prefs.onboarded !== false;
 }

@@ -1,18 +1,36 @@
 import { T, Var } from "gt-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { InlineButton } from "~/components/ui/button";
 import { AstroAvatar } from "./AstroAvatar";
 import { AstroCustomizer } from "./AstroCustomizer";
+import { syncAstroBrainQuietly } from "./astroBrainFiles";
 import { astroDisplayName, useAstroPrefs } from "./astroPrefs";
+import { useAstroEnvironmentId } from "./useAstroEnvironmentId";
 
 // Static, very faint dot pattern; faded at the edges so it never sits under the heading's ends.
 const STARFIELD_CLASS =
   "pointer-events-none absolute inset-x-0 -top-10 bottom-0 -z-10 opacity-25 dark:opacity-35 [background-image:radial-gradient(circle,var(--color-foreground)_0.6px,transparent_1.2px),radial-gradient(circle,var(--color-foreground)_0.5px,transparent_1px)] [background-position:7px_11px,23px_29px] [background-size:61px_53px,37px_43px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]";
 
+let brainSyncedThisSession = false;
+
+/** The first project-less chat of a session refreshes Astro's brain files in the scratch root. */
+function useSyncAstroBrainOnce(scratch: boolean) {
+  const environmentId = useAstroEnvironmentId();
+  const [prefs] = useAstroPrefs();
+  const name = astroDisplayName(prefs);
+  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- writes Astro's brain files on the server once per app session
+  useEffect(() => {
+    if (!scratch || environmentId === null || brainSyncedThisSession) return;
+    brainSyncedThisSession = true;
+    syncAstroBrainQuietly(environmentId, name);
+  }, [scratch, environmentId, name]);
+}
+
 /** Astro above the new-thread heading, with the way into its customizer. */
-export function AstroHero() {
+export function AstroHero({ scratch }: { scratch: boolean }) {
   const [customizerOpen, setCustomizerOpen] = useState(false);
+  useSyncAstroBrainOnce(scratch);
   return (
     <>
       <div aria-hidden="true" className={STARFIELD_CLASS} />

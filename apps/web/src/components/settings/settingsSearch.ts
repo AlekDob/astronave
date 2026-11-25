@@ -23,6 +23,8 @@ export type SettingsPath =
   | "/settings/diagnostics"
   | "/settings/voice"
   | "/settings/appearance"
+  // Astronave: settings page for the Astro companion.
+  | "/settings/astro"
   | "/settings/chat"
   | "/settings/diffs"
   | "/settings/keybindings"
@@ -101,6 +103,7 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/projects": msg("Projects"),
   "/settings/general": msg("General"),
   "/settings/appearance": msg("Appearance"),
+  "/settings/astro": msg("Astro"),
   "/settings/chat": msg("Chat"),
   "/settings/diffs": msg("Diffs & pull requests"),
   "/settings/keybindings": msg("Keybindings"),
@@ -145,6 +148,7 @@ const ALL_SETTINGS_NAV_GROUPS: ReadonlyArray<SettingsNavGroup> = [
     paths: [
       "/settings/general",
       "/settings/appearance",
+      "/settings/astro",
       "/settings/chat",
       "/settings/diffs",
       "/settings/keybindings",
@@ -1522,6 +1526,7 @@ const SETTINGS_CATEGORY_SCOPES: Readonly<Record<SettingsPath, SettingsSearchScop
   "/settings/general": null,
   "/settings/voice": null,
   "/settings/appearance": null,
+  "/settings/astro": null,
   "/settings/chat": null,
   "/settings/diffs": null,
   "/settings/snap-shot": null,

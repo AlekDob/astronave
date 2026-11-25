@@ -12,7 +12,9 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Toggle, ToggleGroup } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
-import { AstroAvatar } from "./AstroAvatar";
+import { AstroAvatar, type AstroAvatarSize } from "./AstroAvatar";
+import { syncAstroBrainQuietly } from "./astroBrainFiles";
+import { useAstroEnvironmentId } from "./useAstroEnvironmentId";
 import {
   ASTRO_LEDS,
   ASTRO_MOUTHS,
@@ -30,9 +32,6 @@ export function AstroCustomizer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const gt = useGT();
-  const m = useMessages();
-  const [prefs, setPrefs] = useAstroPrefs();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup className="max-w-md">
@@ -42,67 +41,91 @@ export function AstroCustomizer({
           </DialogTitle>
         </DialogHeader>
         <DialogPanel>
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col items-center gap-2">
-              <AstroAvatar size="preview" interactive />
-              <span className="font-medium text-lg">{astroDisplayName(prefs)}</span>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="astro-name">
-                <T>Name</T>
-              </Label>
-              <Input
-                id="astro-name"
-                maxLength={16}
-                value={prefs.name}
-                onChange={(event) =>
-                  setPrefs((current) => ({ ...current, name: event.target.value }))
-                }
-              />
-            </div>
-            <Field label={<T>Suit</T>}>
-              {keysOf(ASTRO_SUITS).map((suit) => (
-                <Swatch
-                  key={suit}
-                  color={ASTRO_SUITS[suit].color}
-                  label={m(ASTRO_SUITS[suit].label)}
-                  pressed={prefs.suit === suit}
-                  onClick={() => setPrefs((current) => ({ ...current, suit }))}
-                />
-              ))}
-            </Field>
-            <Field label={<T>Visor LEDs</T>}>
-              {keysOf(ASTRO_LEDS).map((led) => (
-                <Swatch
-                  key={led}
-                  color={ASTRO_LEDS[led].color}
-                  label={m(ASTRO_LEDS[led].label)}
-                  pressed={prefs.led === led}
-                  onClick={() => setPrefs((current) => ({ ...current, led }))}
-                />
-              ))}
-            </Field>
-            <Field label={<T>Mouth</T>}>
-              <ToggleGroup
-                aria-label={gt("Mouth")}
-                variant="segmented"
-                value={[prefs.mouth]}
-                onValueChange={(value) => {
-                  const mouth = keysOf(ASTRO_MOUTHS).find((key) => key === value[0]);
-                  if (mouth) setPrefs((current) => ({ ...current, mouth }));
-                }}
-              >
-                {keysOf(ASTRO_MOUTHS).map((mouth) => (
-                  <Toggle key={mouth} value={mouth}>
-                    {m(ASTRO_MOUTHS[mouth])}
-                  </Toggle>
-                ))}
-              </ToggleGroup>
-            </Field>
-          </div>
+          <AstroCustomizerFields />
         </DialogPanel>
       </DialogPopup>
     </Dialog>
+  );
+}
+
+/** Preview plus look fields; shared by the dialog, Settings > Astro and onboarding. */
+export function AstroCustomizerFields({
+  avatarSize = "preview",
+}: {
+  avatarSize?: AstroAvatarSize;
+}) {
+  const [prefs, setPrefs] = useAstroPrefs();
+  const environmentId = useAstroEnvironmentId();
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col items-center gap-2">
+        <AstroAvatar size={avatarSize} interactive />
+        <span className="font-medium text-lg">{astroDisplayName(prefs)}</span>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="astro-name">
+          <T>Name</T>
+        </Label>
+        <Input
+          id="astro-name"
+          maxLength={16}
+          value={prefs.name}
+          onChange={(event) => setPrefs((current) => ({ ...current, name: event.target.value }))}
+          // The brain files carry the name; rewriting them once per edit, not per keystroke.
+          onBlur={() => syncAstroBrainQuietly(environmentId, astroDisplayName(prefs))}
+        />
+      </div>
+      <AstroLookFields />
+    </div>
+  );
+}
+
+function AstroLookFields() {
+  const gt = useGT();
+  const m = useMessages();
+  const [prefs, setPrefs] = useAstroPrefs();
+  return (
+    <>
+      <Field label={<T>Suit</T>}>
+        {keysOf(ASTRO_SUITS).map((suit) => (
+          <Swatch
+            key={suit}
+            color={ASTRO_SUITS[suit].color}
+            label={m(ASTRO_SUITS[suit].label)}
+            pressed={prefs.suit === suit}
+            onClick={() => setPrefs((current) => ({ ...current, suit }))}
+          />
+        ))}
+      </Field>
+      <Field label={<T>Visor LEDs</T>}>
+        {keysOf(ASTRO_LEDS).map((led) => (
+          <Swatch
+            key={led}
+            color={ASTRO_LEDS[led].color}
+            label={m(ASTRO_LEDS[led].label)}
+            pressed={prefs.led === led}
+            onClick={() => setPrefs((current) => ({ ...current, led }))}
+          />
+        ))}
+      </Field>
+      <Field label={<T>Mouth</T>}>
+        <ToggleGroup
+          aria-label={gt("Mouth")}
+          variant="segmented"
+          value={[prefs.mouth]}
+          onValueChange={(value) => {
+            const mouth = keysOf(ASTRO_MOUTHS).find((key) => key === value[0]);
+            if (mouth) setPrefs((current) => ({ ...current, mouth }));
+          }}
+        >
+          {keysOf(ASTRO_MOUTHS).map((mouth) => (
+            <Toggle key={mouth} value={mouth}>
+              {m(ASTRO_MOUTHS[mouth])}
+            </Toggle>
+          ))}
+        </ToggleGroup>
+      </Field>
+    </>
   );
 }
 

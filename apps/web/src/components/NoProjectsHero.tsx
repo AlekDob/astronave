@@ -10,6 +10,7 @@ import { Button } from "./ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
+import { AstroOnboardingGate } from "~/astro/AstroOnboarding";
 
 export function NoProjectsHero() {
   const gt = useGT();
@@ -28,7 +29,8 @@ export function NoProjectsHero() {
         {/* The desktop window only moves where CSS opts in, so keep a titlebar strip. */}
         {isElectron ? <WorkspacePageHeader electron /> : null}
         <Empty size="hero" className="flex-1">
-          <div className="w-full max-w-lg px-8 py-12">
+          {/* Astronave: first launch shows "Create your Astro" before this welcome. */}
+          <AstroOnboardingGate className="w-full max-w-lg px-8 py-12">
             <EmptyHeader className="max-w-none">
               <EmptyTitle>
                 <T>What should we work on?</T>
@@ -55,7 +57,7 @@ export function NoProjectsHero() {
                 )}
               </div>
             </EmptyHeader>
-          </div>
+          </AstroOnboardingGate>
         </Empty>
       </div>
     </SidebarInset>

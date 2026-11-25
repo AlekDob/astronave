@@ -7,13 +7,10 @@ import { ASTRO_LEDS, ASTRO_SUITS, useAstroPrefs } from "./astroPrefs";
 
 const IMAGE_SIZE = 1024;
 const BIG = { crop: { x: 0, y: 0, s: IMAGE_SIZE }, cols: 48, rows: 42 } as const;
-// The round avatar crops to the helmet so the visor stays readable at 24 px.
-const SMALL = { crop: { x: 200, y: 20, s: 620 }, cols: 15, rows: 13 } as const;
 
 const SIZES = {
   preview: { px: 224, grid: BIG, className: "size-56 rounded-xl" },
   hero: { px: 120, grid: BIG, className: "size-30 rounded-xl" },
-  row: { px: 24, grid: SMALL, className: "size-6 rounded-full" },
 } as const;
 
 export type AstroAvatarSize = keyof typeof SIZES;
