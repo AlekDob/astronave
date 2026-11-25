@@ -50,12 +50,7 @@ const MANAGED_TEMPLATE = `<!-- Astronave: file gestito dall'app, non modificarlo
 
 Ti chiami {name}: sei il compagno di bordo di Astronave. Questa chat non ha un progetto: aiuti la persona con domande, idee, piccoli lavori e a imparare a usare Claude Code.
 
-@astro/ASTRO.md
-@astro/USER.md
-@astro/MEMORY.md
-@astro/skills/INDEX.md
-
-(Se non vedi qui sopra il contenuto di quei file, leggili tu all'inizio: sono in ../astro/.)
+{memory}
 
 ## Due livelli di memoria
 - Memoria corta: ../astro/USER.md e ../astro/MEMORY.md. La leggi sempre, quindi resta sotto i ${ASTRO_SHORT_MEMORY_LIMIT} caratteri.
@@ -74,8 +69,47 @@ La tua memoria dura tra una chat e l'altra e sta nella cartella ../astro/ (rispe
 9. Quando salvi qualcosa, dillo in una riga ("Me lo ricordo." / "Ho imparato una nuova abilità: ...").
 `;
 
+// Claude Code reads CLAUDE.md from the parent folder and expands these imports.
+const CLAUDE_MEMORY = `@astro/ASTRO.md
+@astro/USER.md
+@astro/MEMORY.md
+@astro/skills/INDEX.md
+
+(Se non vedi qui sopra il contenuto di quei file, leggili tu all'inizio: sono in ../astro/.)
+`;
+
+// Other agents read AGENTS.md only from the chat folder (the server copies it there when the
+// chat starts) and expand no imports, so the memory is written out in full.
+const AGENTS_SECTIONS: ReadonlyArray<readonly [string, string]> = [
+  ["Chi sei", ASTRO_PERSONA_FILE],
+  ["Cosa sai della persona", ASTRO_USER_FILE],
+  ["Memoria", ASTRO_MEMORY_FILE],
+  ["Abilità imparate", ASTRO_SKILLS_INDEX],
+];
+
+function agentsMemory(existing: BrainContents): string {
+  const sections = AGENTS_SECTIONS.map(([title, path]) => {
+    const contents = existing[path] ?? ASTRO_SEED_FILES[path] ?? "";
+    return `## ${title} (../${path})\n\n${contents.trim()}\n`;
+  });
+  const intro =
+    "Qui sotto c'è la tua memoria com'era quando è iniziata questa chat. I file veri sono in ../astro/: se li cambi, rileggili da lì.\n";
+  return [intro, ...sections].join("\n");
+}
+
+function fillManagedTemplate(name: string, memory: string): string {
+  // A function replacer, so `$` in the person's notes is never read as a pattern.
+  return MANAGED_TEMPLATE.replaceAll("{name}", name).replace("{memory}", () => memory);
+}
+
+/** CLAUDE.md: imports the memory files. */
 export function astroManagedText(name: string): string {
-  return MANAGED_TEMPLATE.replaceAll("{name}", name);
+  return fillManagedTemplate(name, CLAUDE_MEMORY);
+}
+
+/** AGENTS.md: self-contained, with the memory files' current text inlined. */
+export function astroAgentsText(name: string, existing: BrainContents): string {
+  return fillManagedTemplate(name, agentsMemory(existing));
 }
 
 /** Managed files are rewritten; seeds are written only if still missing right before. */
@@ -100,13 +134,13 @@ export type AstroBrainAction = AstroBrainWrite | AstroOverflowMove;
 
 type BrainContents = Readonly<Record<string, string | null>>;
 
-/** `existing` maps each brain path to its contents, or null when the file is missing. */
-export function planAstroBrainWrites(
-  name: string,
-  existing: BrainContents,
-  date: string,
-): AstroBrainAction[] {
-  const actions: AstroBrainAction[] = planManagedWrites(name, existing);
+/**
+ * `existing` maps each brain path to its contents, or null when the file is missing.
+ * Managed files are planned apart (planManagedWrites), after these writes, since AGENTS.md
+ * inlines their result.
+ */
+export function planAstroBrainWrites(existing: BrainContents, date: string): AstroBrainAction[] {
+  const actions: AstroBrainAction[] = [];
   for (const [relativePath, contents] of Object.entries(ASTRO_SEED_FILES)) {
     if (existing[relativePath] == null) actions.push({ kind: "seed", relativePath, contents });
   }
@@ -117,18 +151,20 @@ export function planAstroBrainWrites(
   return actions;
 }
 
-/** Only CLAUDE.md / AGENTS.md: enough when just the name changed. */
+/** CLAUDE.md / AGENTS.md, each rewritten only when its generated text changed. */
 export function planManagedWrites(name: string, existing: BrainContents): AstroBrainWrite[] {
-  const contents = astroManagedText(name);
-  return ASTRO_MANAGED_FILES.filter((path) => existing[path] !== contents).map((relativePath) => ({
-    kind: "managed",
-    relativePath,
-    contents,
-  }));
+  const generated: Record<(typeof ASTRO_MANAGED_FILES)[number], string> = {
+    "CLAUDE.md": astroManagedText(name),
+    "AGENTS.md": astroAgentsText(name, existing),
+  };
+  return ASTRO_MANAGED_FILES.filter((path) => existing[path] !== generated[path]).map(
+    (relativePath) => ({ kind: "managed", relativePath, contents: generated[relativePath] }),
+  );
 }
 
+/** What planManagedWrites needs to read: the managed files and the memory AGENTS.md inlines. */
 export function astroManagedPaths(): string[] {
-  return [...ASTRO_MANAGED_FILES];
+  return [...ASTRO_MANAGED_FILES, ...AGENTS_SECTIONS.map(([, path]) => path)];
 }
 
 function planOverflow(

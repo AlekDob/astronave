@@ -331,6 +331,39 @@ it.effect("gives each Scratch thread its own folder, named from its message", ()
   ),
 );
 
+// Astronave: agents that read AGENTS.md only from their cwd get the scratch root's copy.
+it.effect("seeds each new Scratch folder with the root AGENTS.md, best-effort", () =>
+  withScratch(() =>
+    Effect.gen(function* () {
+      const scratch = yield* ManagedProjectFolders.ManagedProjectFolders;
+      const fileSystem = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const { projectId } = yield* scratch.ensureScratchProject;
+      const root = yield* requireRoot;
+      const newFolder = (threadId: string) =>
+        scratch
+          .folderForThread({ projectId, threadId: ThreadId.make(threadId), text: "Ciao" })
+          .pipe(Effect.map(Option.getOrThrow));
+
+      const without = yield* newFolder("thread-no-agents");
+      assert.isFalse(yield* fileSystem.exists(path.join(without, "AGENTS.md")));
+
+      yield* fileSystem.writeFileString(path.join(root, "AGENTS.md"), "# Shared notes\n");
+      const seeded = yield* newFolder("thread-agents");
+      assert.equal(
+        yield* fileSystem.readFileString(path.join(seeded, "AGENTS.md")),
+        "# Shared notes\n",
+      );
+
+      // A copy that fails (here the source is a folder) still hands out the thread's folder.
+      yield* fileSystem.remove(path.join(root, "AGENTS.md"));
+      yield* fileSystem.makeDirectory(path.join(root, "AGENTS.md"));
+      const unseeded = yield* newFolder("thread-copy-fails");
+      assert.isTrue(yield* fileSystem.exists(unseeded));
+    }),
+  ),
+);
+
 it.effect("leaves threads in other projects alone", () =>
   withScratch(({ baseDir }) =>
     Effect.gen(function* () {

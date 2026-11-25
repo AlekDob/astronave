@@ -18,7 +18,9 @@ import {
   ASTRO_SEED_FILES,
   ASTRO_USER_FILE,
   astroBrainPaths,
+  astroAgentsText,
   astroManagedText,
+  planManagedWrites,
   planAstroBrainWrites,
   skillSummary,
 } from "./astroBrain";
@@ -28,29 +30,13 @@ const DATE = "2026-11-25";
 const missing = () => Object.fromEntries(astroBrainPaths().map((path) => [path, null]));
 
 describe("planAstroBrainWrites", () => {
-  it("writes every file on a fresh scratch root, with the name filled in", () => {
-    const writes = planAstroBrainWrites("Luna", missing(), DATE).filter(
+  it("seeds every user file on a fresh scratch root", () => {
+    const writes = planAstroBrainWrites(missing(), DATE).filter(
       (action) => action.kind !== "overflow",
     );
     expect(writes.map((write) => write.relativePath).toSorted()).toEqual(
-      astroBrainPaths().toSorted(),
+      Object.keys(ASTRO_SEED_FILES).toSorted(),
     );
-    const claude = writes.find((write) => write.relativePath === "CLAUDE.md")?.contents ?? "";
-    expect(claude).toContain("# Luna\n");
-    expect(claude).toContain("Ti chiami Luna:");
-    expect(claude).not.toContain("{name}");
-    expect(claude.startsWith("<!-- Astronave:")).toBe(true);
-  });
-
-  it("rewrites managed files only when they differ, and never touches existing user files", () => {
-    const existing = {
-      ...Object.fromEntries(Object.keys(ASTRO_SEED_FILES).map((path) => [path, "mine"])),
-      "CLAUDE.md": astroManagedText("Luna"),
-      "AGENTS.md": "edited by hand",
-    };
-    expect(planAstroBrainWrites("Luna", existing, DATE)).toEqual([
-      { kind: "managed", relativePath: "AGENTS.md", contents: astroManagedText("Luna") },
-    ]);
   });
 
   it("seeds only the missing user file", () => {
@@ -60,12 +46,55 @@ describe("planAstroBrainWrites", () => {
       "AGENTS.md": astroManagedText("Astro"),
       [ASTRO_PERSONA_FILE]: null,
     };
-    expect(planAstroBrainWrites("Astro", existing, DATE)).toEqual([
+    expect(planAstroBrainWrites(existing, DATE)).toEqual([
       {
         kind: "seed",
         relativePath: ASTRO_PERSONA_FILE,
         contents: ASTRO_SEED_FILES[ASTRO_PERSONA_FILE],
       },
+    ]);
+  });
+});
+
+describe("planManagedWrites", () => {
+  const memory = {
+    [ASTRO_PERSONA_FILE]: "# Chi è Astro\nParla piano.\n",
+    [ASTRO_USER_FILE]: "# Persona\n- ama il $ e i {name}\n",
+  };
+
+  it("fills the name in CLAUDE.md, which imports the memory", () => {
+    const claude = astroManagedText("Luna");
+    expect(claude.startsWith("<!-- Astronave:")).toBe(true);
+    expect(claude).toContain("# Luna\n");
+    expect(claude).toContain("Ti chiami Luna:");
+    expect(claude).toContain("@astro/USER.md");
+    expect(claude).not.toContain("{name}");
+  });
+
+  it("makes AGENTS.md self-contained: memory inlined, no imports, paths for the chat folder", () => {
+    const agents = astroAgentsText("Luna", memory);
+    expect(agents).toContain("Ti chiami Luna:");
+    expect(agents).toContain("## Chi sei (../astro/ASTRO.md)\n\n# Chi è Astro\nParla piano.\n");
+    expect(agents).toContain("- ama il $ e i {name}");
+    expect(agents).toContain(ASTRO_SEED_FILES[ASTRO_MEMORY_FILE]?.trim() ?? "");
+    expect(agents).not.toContain("@astro/");
+    expect(agents).toContain("../astro/skills/INDEX.md");
+  });
+
+  it("rewrites a managed file only when its generated text changed", () => {
+    const current = {
+      ...memory,
+      "CLAUDE.md": astroManagedText("Luna"),
+      "AGENTS.md": astroAgentsText("Luna", memory),
+    };
+    expect(planManagedWrites("Luna", current)).toEqual([]);
+    const edited = { ...current, [ASTRO_USER_FILE]: "# Persona\n- nuovo\n" };
+    expect(planManagedWrites("Luna", edited)).toEqual([
+      { kind: "managed", relativePath: "AGENTS.md", contents: astroAgentsText("Luna", edited) },
+    ]);
+    expect(planManagedWrites("Sole", current).map((write) => write.relativePath)).toEqual([
+      "CLAUDE.md",
+      "AGENTS.md",
     ]);
   });
 });
@@ -124,7 +153,7 @@ describe("splitOverflow", () => {
       "AGENTS.md": astroManagedText("Astro"),
       [ASTRO_MEMORY_FILE]: memory,
     };
-    const [move] = planAstroBrainWrites("Astro", existing, DATE);
+    const [move] = planAstroBrainWrites(existing, DATE);
     if (move?.kind !== "overflow") throw new Error("expected an overflow move");
     expect(move.archivePath).toBe(ASTRO_MEMORY_ARCHIVE);
     // The archive is re-read right before writing: a line Astro added meanwhile is kept.
@@ -138,7 +167,7 @@ describe("splitOverflow", () => {
   });
 
   it("skips the move when the memory changed since planning", () => {
-    const move = planAstroBrainWrites("Astro", { [ASTRO_MEMORY_FILE]: memory }, DATE).find(
+    const move = planAstroBrainWrites({ [ASTRO_MEMORY_FILE]: memory }, DATE).find(
       (action) => action.kind === "overflow",
     );
     if (move?.kind !== "overflow") throw new Error("expected an overflow move");

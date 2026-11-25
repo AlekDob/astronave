@@ -376,7 +376,7 @@ const make = Effect.gen(function* () {
       path.join(root.value, [date, words, idPart].filter(Boolean).join("-"));
     yield* makeScratchFolder(root.value);
     const fullFolder = folderFor(id);
-    return yield* claimFreeFolder(
+    const claimed = yield* claimFreeFolder(
       (attempt) =>
         attempt === 1
           ? Effect.succeedSome(folderFor(id.slice(-8)))
@@ -388,7 +388,23 @@ const make = Effect.gen(function* () {
               ),
       (folder, cause) => new ScratchFolderError({ folder, cause }),
     );
+    if (Option.isSome(claimed)) yield* seedScratchAgents(root.value, claimed.value);
+    return claimed;
   });
+
+  // Astronave: agents other than Claude Code read AGENTS.md only from their cwd, so each new
+  // scratch folder gets a copy of the scratch root's one. Best-effort: never fails the launch.
+  const seedScratchAgents = (root: string, folder: string) => {
+    const source = path.join(root, "AGENTS.md");
+    return fileSystem.exists(source).pipe(
+      Effect.flatMap((exists) =>
+        exists ? fileSystem.copyFile(source, path.join(folder, "AGENTS.md")) : Effect.void,
+      ),
+      Effect.catchCause((cause) =>
+        Effect.logWarning("Could not copy AGENTS.md into the scratch folder", { folder, cause }),
+      ),
+    );
+  };
 
   const namedProjectsRoot = path.resolve(config.baseDir, "projects");
 

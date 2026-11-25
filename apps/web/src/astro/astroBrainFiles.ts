@@ -22,7 +22,12 @@ import {
   planManagedWrites,
   serializeVersions,
 } from "./astroBrain";
-import { readAstroPrefs, updateAstroPrefs, withoutPendingAbout } from "./astroPrefs";
+import {
+  astroDisplayName,
+  readAstroPrefs,
+  updateAstroPrefs,
+  withoutPendingAbout,
+} from "./astroPrefs";
 
 /** The scratch project: its root is the parent of every project-less chat folder. */
 export interface AstroBrainTarget {
@@ -160,6 +165,10 @@ export function saveBrainFile(
     if ((current ?? "") !== expected) return current ?? "";
     await snapshotBrainFile(target, relativePath, current);
     await writeBrainFile(target, relativePath, contents);
+    // The save itself succeeded; a stale AGENTS.md is refreshed again by the next sync.
+    await syncManagedFiles(target, astroDisplayName(readAstroPrefs())).catch((error: unknown) =>
+      console.warn("[astro] Could not refresh AGENTS.md after a save.", error),
+    );
     return null;
   });
 }
@@ -213,12 +222,19 @@ async function syncAstroBrainNow(environmentId: EnvironmentId, name: string) {
   for (const path of ASTRO_VERSIONED_FILES) {
     await snapshotBrainFile(target, path, existing[path] ?? null);
   }
-  for (const action of planAstroBrainWrites(name, existing, today())) {
+  for (const action of planAstroBrainWrites(existing, today())) {
     await applyBrainAction(target, action);
   }
   await appendPendingAbout(target);
-  lastSyncedName = name;
+  await syncManagedFiles(target, name);
   return target;
+}
+
+/** Last step of every brain change: AGENTS.md inlines the memory, so it is re-read fresh. */
+async function syncManagedFiles(target: AstroBrainTarget, name: string) {
+  const existing = await readBrainContents(target, astroManagedPaths());
+  for (const write of planManagedWrites(name, existing)) await applyBrainAction(target, write);
+  lastSyncedName = name;
 }
 
 export function syncAstroBrain(
@@ -247,9 +263,6 @@ export function syncAstroBrainQuietly(
 export function syncAstroNameQuietly(environmentId: EnvironmentId | null, name: string): void {
   if (environmentId === null || name === lastSyncedName) return;
   enqueueBrainOp(async () => {
-    const target = await openAstroBrain(environmentId);
-    const existing = await readBrainContents(target, astroManagedPaths());
-    for (const write of planManagedWrites(name, existing)) await applyBrainAction(target, write);
-    lastSyncedName = name;
+    await syncManagedFiles(await openAstroBrain(environmentId), name);
   }).catch((error: unknown) => console.warn("[astro] Could not rename Astro.", error));
 }
