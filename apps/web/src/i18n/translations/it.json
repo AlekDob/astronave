@@ -71,7 +71,6 @@
   "cd03eb1b84271c02": "Agente",
   "bfe1a60f3f9c60fb": "Turno {turn} · {what}",
   "dfdaa6255a416140": "Riepilogo di {turns, plural, one {{turns} turno recente} other {{turns} turni recenti}}, {textTurns, plural, =0 {nessun testo dei messaggi} one {testo del messaggio dell'ultimo turno} other {testo dei messaggi degli ultimi {textTurns} turni}}{truncated, select, yes {, accorciato per farlo stare} other {}}",
-  "260c6b45f52d2f27": "Aggiunge il testo dei tuoi messaggi e delle risposte dell'agente negli ultimi {textTurns, plural, one {turno} other {{textTurns} turni}}.",
   "afac52a5cc2dc801": "Non è stato possibile inviare la tua risposta. Riprova.",
   "79d776428f4d0650": "Non è stato possibile caricare il file. Riconnettiti e riprova.",
   "3ea34cbb1ca5ba9b": "Anteprima annullata.",
@@ -2813,9 +2812,9 @@
   "db7b3a938c45e56c": "Aggiornamento {version} pronto da scaricare",
   "9a951140b69ba740": "Download dell'aggiornamento in corso ({percent}%)",
   "7fdece033260e9fb": "Download dell'aggiornamento in corso",
-  "52e1d4a487c0cf4b": "Installazione di {version} non riuscita. Clicca per riprovare.",
   "09ef51903e99e876": "Aggiornamento scaricato. Clicca per riavviare e installare.",
   "d62631cab06d2b80": "Aggiornamento {version} scaricato. Clicca per riavviare e installare.",
+  "52e1d4a487c0cf4b": "Installazione di {version} non riuscita. Clicca per riprovare.",
   "78a04e0e625c0990": "Aggiornamento non riuscito",
   "c24de5eb69373a55": "Questa versione {build} ignora le release {track}. Controlla il canale di aggiornamento nelle Impostazioni per completare il passaggio.",
   "b02ae45a6109c93b": "Aggiornato",
@@ -3609,18 +3608,6 @@
   "d69b98c233cff637": "Mostra la domanda e le sue opzioni",
   "a99a39a39e74c3a4": "Nascondi la domanda e le sue opzioni",
   "4ba809b241e0decb": "Chiudi la domanda senza rispondere",
-  "c425f10897de6fee": "Modalità piano attiva. Clicca per tornare alla modalità normale.",
-  "46e7b21a46d1eb01": "Piano",
-  "1ef0ccbe5aa656ac": "Modalità piano",
-  "9266af6a803b3950": "L'agente propone un piano senza modificare i file.",
-  "82e322fbbb02bbc8": [
-    {
-      "t": "Kbd",
-      "i": 1,
-      "c": "⇧ Tab"
-    },
-    " torna alla modalità normale"
-  ],
   "1a69170d892d1e8f": "Invio in corso...",
   "6217adf8c8894798": "Invia",
   "47db6ee3a2986075": "Avanti",
@@ -3729,6 +3716,7 @@
   "4e0710d19dfc2e7e": "Inviare questo report al team di Astronave?",
   "87d0ae0723ba75d1": "Questo è tutto ciò che lascia il tuo computer. Non viene inviato nulla finché non premi Invia.",
   "bf19826f81484328": "Includi la conversazione",
+  "260c6b45f52d2f27": "Aggiunge il testo dei tuoi messaggi e delle risposte dell'agente negli ultimi {textTurns, plural, one {turno} other {{textTurns} turni}}.",
   "ddb7e6f8ce99e657": "Solo chi può eseguire agenti su questo computer può inviarlo o rifiutarlo.",
   "03c1eb603c112f47": "Non inviare",
   "653405e4ed498d9f": "Invia",
@@ -8843,13 +8831,9 @@
   "ed83b25c71c98a20": "Scegli uno o più {scope} di {tracker} per ogni progetto. Le loro issue compaiono accanto a quelle del repository e gli agenti aprono le nuove issue nel primo, a meno che non ne venga chiesto un altro.",
   "19c2d5e81ff8f89a": "{scope} di {tracker} per {project}",
   "68e061510b765772": "Non associato",
-  "99d51127f573296b": "Un altro account",
-  "8ec2c57414669b79": "Collega un secondo workspace o utente di {tracker}.",
-  "99963c0142e17f00": "Per il nuovo account {tracker}.",
   "a2d95d39d3398bda": "Credenziale rifiutata",
   "9eae463720500113": "Salvato sul server.",
   "b6e27ab2537ef874": "Creane uno",
-  "6d8e4ebc889bace9": "Aggiungi account",
   "13ef526271b0f5d4": "Rimuovi tutte le condizioni",
   "d1938a629f039515": "Rimuovi condizione",
   "84a605b241ce65b7": "Rimuovi il gruppo e le sue condizioni",
@@ -12696,16 +12680,6 @@
   "156ff7b625287a1e": "Nascondi saltati",
   "69b985b97ab45e6b": "Mostra {count} saltati",
   "2400254d362de84d": "Caricamento delle esecuzioni dei workflow…",
-  "cae5c3205c01d062": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": "Un file del workflow ha un problema."
-    },
-    " ",
-    "Continua a funzionare l'ultima versione senza problemi."
-  ],
-  "ed8ce6ebc73dc12d": "Apri il file",
   "145e1f7503ba3b2c": [
     "Questo ambiente non ha nessuna esecuzione con quel link.",
     " ",
@@ -12731,6 +12705,16 @@
       "c": "Leggi la guida"
     }
   ],
+  "cae5c3205c01d062": [
+    {
+      "t": "span",
+      "i": 1,
+      "c": "Un file del workflow ha un problema."
+    },
+    " ",
+    "Continua a funzionare l'ultima versione senza problemi."
+  ],
+  "ed8ce6ebc73dc12d": "Apri il file",
   "5d8d278ff828102d": "Tutti i workflow",
   "39459da07479f482": "Agente",
   "7741243632056b81": "{step} · trascrizione",
@@ -12874,5 +12858,14 @@
   "27d76249d09eb69f": "Guida alla revisione pronta",
   "faa3bb26abb39c93": "Guida alla revisione non riuscita",
   "b7df38b7d8792d78": "Apri la guida",
-  "9e91e9a77b664e4e": "Impossibile avviare una guida alla revisione"
+  "9e91e9a77b664e4e": "Impossibile avviare una guida alla revisione",
+  "99d51127f573296b": "Un altro account",
+  "8ec2c57414669b79": "Collega un secondo workspace o utente di {tracker}.",
+  "99963c0142e17f00": "Per il nuovo account {tracker}.",
+  "6d8e4ebc889bace9": "Aggiungi account",
+  "46e7b21a46d1eb01": "Piano",
+  "c425f10897de6fee": "Modalità piano attiva. Clicca per tornare alla modalità normale.",
+  "1ef0ccbe5aa656ac": "Modalità piano",
+  "9266af6a803b3950": "L'agente propone un piano senza modificare i file.",
+  "82e322fbbb02bbc8": [{ "t": "Kbd", "i": 1, "c": "⇧ Tab" }, " torna alla modalità normale"]
 }

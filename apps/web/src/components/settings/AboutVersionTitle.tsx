@@ -4,7 +4,7 @@ import { APP_VERSION } from "../../branding";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 // Astronave: MIT attribution to the upstream project, kept out of the i18n catalog on purpose.
 const UPSTREAM_URL = "https://github.com/pingdotgg/t3code";
@@ -35,22 +35,22 @@ export function AboutVersionTitle() {
         <T>Version</T>
       </span>
       <code className="text-2xs font-medium">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <InlineButton
-                tone="muted"
-                aria-label={gt("Copy version {version}", { version: APP_VERSION })}
-                onClick={() => copyToClipboard(APP_VERSION, undefined)}
-              >
-                {APP_VERSION}
-              </InlineButton>
-            }
-          />
-          <TooltipPopup>
-            <T>Copy version</T>
-          </TooltipPopup>
-        </Tooltip>
+        <SharedTooltipTrigger
+          render={
+            <InlineButton
+              tone="muted"
+              aria-label={gt("Copy version {version}", { version: APP_VERSION })}
+              onClick={() => copyToClipboard(APP_VERSION, undefined)}
+            >
+              {APP_VERSION}
+            </InlineButton>
+          }
+          label={
+            <>
+              <T>Copy version</T>
+            </>
+          }
+        />
       </code>
       <a
         className="text-2xs text-muted-foreground underline"
