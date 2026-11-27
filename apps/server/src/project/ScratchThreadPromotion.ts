@@ -138,19 +138,19 @@ const make = Effect.gen(function* () {
   // Astronave: a scratch folder holds a copy of the scratch root's AGENTS.md (see
   // ManagedProjectFolders.seedScratchAgents). The root's text changes over time, so the copy is
   // recognized by its first line, and removed so the new project does not inherit it.
-  const dropSeededAgents = Effect.fn("ScratchThreadPromotion.dropSeededAgents")(function* (
-    scratchRoot: string,
-    folder: string,
-  ) {
-    const copy = path.join(folder, "AGENTS.md");
-    const firstLine = (text: string) => text.split("\n", 1)[0]?.trim() ?? "";
-    const rootLine = firstLine(
-      yield* fileSystem.readFileString(path.join(scratchRoot, "AGENTS.md")),
-    );
-    if (rootLine !== "" && firstLine(yield* fileSystem.readFileString(copy)) === rootLine) {
-      yield* fileSystem.remove(copy);
-    }
-  }, Effect.ignore);
+  const dropSeededAgents = Effect.fn("ScratchThreadPromotion.dropSeededAgents")(
+    function* (scratchRoot: string, folder: string) {
+      const copy = path.join(folder, "AGENTS.md");
+      const firstLine = (text: string) => text.split("\n", 1)[0]?.trim() ?? "";
+      const rootLine = firstLine(
+        yield* fileSystem.readFileString(path.join(scratchRoot, "AGENTS.md")),
+      );
+      if (rootLine !== "" && firstLine(yield* fileSystem.readFileString(copy)) === rootLine) {
+        yield* fileSystem.remove(copy);
+      }
+    },
+    (effect) => Effect.ignore(effect),
+  );
 
   // bootstrap returns the project that already owns the folder, so retries reuse it.
   const createProject = Effect.fn("ScratchThreadPromotion.createProject")(function* (
